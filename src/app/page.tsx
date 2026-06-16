@@ -53,45 +53,47 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
 
-      {/* ── Navbar ── */}
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <RiactLogo variant="landing" />
+      {/* ── Hero / Navbar (pink gradient banner) ── */}
+      <section className="relative overflow-hidden" style={{background: "linear-gradient(160deg, #ff6eb4 0%, #ec4899 40%, #c026d3 100%)"}}>
+        {/* Subtle shine overlay */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-pink-300/20 blur-3xl" />
+        </div>
+
+        {/* Nav inside the banner */}
+        <div className="relative mx-auto flex max-w-6xl items-center justify-end px-6 pt-5">
           <div className="flex items-center gap-3">
             <Link
               href="/auth"
-              className="rounded-xl px-5 py-2 text-sm font-medium text-slate-600 hover:text-pink-500 transition-colors"
+              className="rounded-xl px-5 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all"
             >
               Log in
             </Link>
             <Link
               href="/auth"
-              className="rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-pink-300/40 hover:from-pink-400 hover:to-pink-500 transition-all"
+              className="rounded-xl bg-white px-5 py-2 text-sm font-semibold text-pink-600 shadow-md hover:bg-pink-50 transition-all"
             >
               Get started free
             </Link>
           </div>
         </div>
-      </header>
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden pt-24 pb-20 px-6">
-        {/* Background blobs */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-pink-100/60 blur-3xl" />
-          <div className="absolute top-40 right-0 h-72 w-72 rounded-full bg-purple-100/40 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-pink-50/80 blur-3xl" />
-        </div>
+        {/* Centred logo + headline */}
+        <div className="relative mx-auto max-w-3xl text-center px-6 pt-12 pb-20">
+          {/* Logo */}
+          <div className="mb-8 flex justify-center">
+            <div className="flex items-center justify-center rounded-3xl bg-white/20 backdrop-blur-sm shadow-xl p-6">
+              <RiactLogo variant="sidebar" />
+            </div>
+          </div>
 
-        <div className="relative mx-auto max-w-3xl text-center">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900 md:text-6xl">
+          <h1 className="text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
             Study smarter.<br />
-            <span className="bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">
-              Beat burnout.
-            </span>
+            <span className="text-white/80">Beat burnout.</span>
           </h1>
 
-          <p className="mt-6 text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
+          <p className="mt-6 text-lg text-pink-100 leading-relaxed max-w-xl mx-auto">
             RIACT tracks your study sessions, detects burnout signals, and gives you
             AI-powered coaching — so you can focus on learning, not guessing.
           </p>
@@ -99,19 +101,19 @@ export default function LandingPage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/auth"
-              className="rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-8 py-3.5 text-base font-semibold text-white shadow-xl shadow-pink-300/40 hover:from-pink-400 hover:to-pink-500 transition-all"
+              className="rounded-xl bg-white px-8 py-3.5 text-base font-semibold text-pink-600 shadow-xl hover:bg-pink-50 transition-all"
             >
               Start tracking for free →
             </Link>
             <Link
               href="/auth"
-              className="rounded-xl border border-slate-200 px-8 py-3.5 text-base font-medium text-slate-600 hover:border-pink-300 hover:text-pink-500 transition-all"
+              className="rounded-xl border border-white/30 px-8 py-3.5 text-base font-medium text-white hover:bg-white/10 transition-all"
             >
               Log in to my account
             </Link>
           </div>
 
-          <p className="mt-4 text-xs text-slate-400">No credit card · Free to use · Works on any device</p>
+          <p className="mt-4 text-xs text-pink-200">No credit card · Free to use · Works on any device</p>
         </div>
       </section>
 
