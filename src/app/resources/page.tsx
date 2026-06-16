@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import AppLayout from "@/components/AppLayout";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { Sparkles, Heart, Clock, Brain } from "lucide-react";

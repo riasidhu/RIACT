@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import AppLayout from "@/components/AppLayout";
 import GoalProgressBars from "@/components/GoalProgressBar";
