@@ -84,11 +84,6 @@ export default function LandingPage() {
         </div>
 
         <div className="relative mx-auto max-w-3xl text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-4 py-1.5 text-xs font-medium text-pink-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-pink-400 animate-pulse" />
-            Built for USAII Global Hackathon 2026
-          </div>
-
           <h1 className="text-5xl font-bold leading-tight tracking-tight text-slate-900 md:text-6xl">
             Study smarter.<br />
             <span className="bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">
@@ -177,7 +172,7 @@ export default function LandingPage() {
       {/* ── Footer ── */}
       <footer className="border-t border-slate-100 py-8 px-6 text-center">
         <p className="text-xs text-slate-400">
-          © 2026 RIACT · Built for USAII Global Hackathon · Record · Insight · Analyze · Coach · Track
+          © 2026 RIACT · Record · Insight · Analyze · Coach · Track
         </p>
       </footer>
     </div>
