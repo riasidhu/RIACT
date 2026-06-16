@@ -87,17 +87,24 @@ export default function DashboardPage() {
 
   async function loadWeeklyRecommendations() {
     setLoadingRecs(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: user.id }),
-    });
-    const data = await res.json();
-    if (data.recommendations) setRecommendations(data.recommendations);
-    setLoadingRecs(false);
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.recommendations) setRecommendations(data.recommendations);
+      }
+    } catch (err) {
+      console.error("AI recommendations failed:", err);
+    } finally {
+      setLoadingRecs(false);
+    }
   }
 
   useEffect(() => {

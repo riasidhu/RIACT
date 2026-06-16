@@ -63,17 +63,22 @@ export default function InsightsPage() {
       setBreaks(brks ?? []);
       setGoals(gols ?? []);
 
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: user.id }),
-      });
+      try {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id }),
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        setAnalysis(data);
+        if (res.ok) {
+          const data = await res.json();
+          setAnalysis(data);
+        }
+      } catch (err) {
+        console.error("AI analysis failed:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     load();
   }, [supabase]);
