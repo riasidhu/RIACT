@@ -1,5 +1,6 @@
 import Link from "next/link";
 import RiactLogo from "@/components/RiactLogo";
+import LandingDemo from "@/components/LandingDemo";
 import { BookOpen, Brain, Flame, MapPin, Shield, Target } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -114,6 +115,15 @@ export default function LandingPage() {
           </div>
 
           <p className="mt-4 text-xs text-pink-200">No credit card · Free to use · Works on any device</p>
+        </div>
+      </section>
+
+      {/* ── Live Demo ── */}
+      <section className="py-20 px-6 bg-white">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="mb-3 text-center text-2xl font-bold text-slate-900">See it in action</h2>
+          <p className="mb-12 text-center text-sm text-slate-400">Watch how a typical study session flows through RIACT</p>
+          <LandingDemo />
         </div>
       </section>
 
