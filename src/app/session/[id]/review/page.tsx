@@ -91,7 +91,7 @@ export default function ReviewSessionPage() {
     setLoading(false);
     if (!error) {
       setSaved(true);
-      setTimeout(() => router.push("/"), 1500);
+      setTimeout(() => router.push("/home"), 1500);
     }
   }
 

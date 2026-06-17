@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes that require authentication
@@ -13,52 +12,31 @@ const PROTECTED_PREFIXES = [
 ];
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) return supabaseResponse;
-
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value)
-        );
-        supabaseResponse = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  // Use getSession() to check auth — reads from cookies, no outbound network call.
-  // This avoids false-redirects when Vercel edge can't reach Supabase auth in time.
-  const { data: { session } } = await supabase.auth.getSession();
-
   const { pathname } = request.nextUrl;
+
+  // Check for a Supabase auth cookie — presence means the user has (or had) a session.
+  // The individual page data queries enforce real auth via RLS; this is just for redirects.
+  const hasAuthCookie = request.cookies.getAll().some(
+    (c) => c.name.includes("auth-token") && c.value.length > 0
+  );
+
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
   // Redirect unauthenticated users away from protected routes
-  if (isProtected && !session) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/auth";
-    return NextResponse.redirect(loginUrl);
+  if (isProtected && !hasAuthCookie) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth";
+    return NextResponse.redirect(url);
   }
 
   // Redirect logged-in users away from /auth back into the app
-  if (pathname === "/auth" && session) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/home";
-    return NextResponse.redirect(homeUrl);
+  if (pathname === "/auth" && hasAuthCookie) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/home";
+    return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {
