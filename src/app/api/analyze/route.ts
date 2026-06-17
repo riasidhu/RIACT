@@ -9,8 +9,12 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 /** Decode a Supabase JWT and return the `sub` (user id) without a network call */
 function getUserIdFromJwt(token: string): string | null {
   try {
+    // Replace URL-safe base64 chars before decoding (base64url → base64)
+    const base64 = token.split(".")[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
     const payload = JSON.parse(
-      Buffer.from(token.split(".")[1], "base64url").toString("utf8")
+      Buffer.from(base64, "base64").toString("utf8")
     );
     return (payload.sub as string) ?? null;
   } catch {

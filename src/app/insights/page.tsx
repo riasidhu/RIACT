@@ -43,6 +43,7 @@ export default function InsightsPage() {
   
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [breaks, setBreaks] = useState<Break[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -84,7 +85,9 @@ export default function InsightsPage() {
           const data = await res.json();
           setAnalysis(data);
         } else {
-          console.error("AI analysis returned", res.status, await res.text());
+          const errText = await res.text();
+          console.error("AI analysis returned", res.status, errText);
+          setApiError(`${res.status}: ${errText}`);
         }
       } catch (err) {
         console.error("Insights load failed:", err);
@@ -159,7 +162,11 @@ export default function InsightsPage() {
             ) : (
               <div className="rounded-lg bg-slate-50 border border-slate-100 p-5 text-center">
                 <Lightbulb size={20} className="text-slate-300 mx-auto mb-2" />
-                <p className="text-sm text-slate-400">Log at least 3 sessions to unlock AI-powered insights.</p>
+                {apiError ? (
+                  <p className="text-xs text-red-400 break-all">{apiError}</p>
+                ) : (
+                  <p className="text-sm text-slate-400">Log at least 3 sessions to unlock AI-powered insights.</p>
+                )}
               </div>
             )}
           </section>
