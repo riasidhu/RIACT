@@ -37,21 +37,22 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Refresh the session (required for server components to read auth state)
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use getSession() to check auth — reads from cookies, no outbound network call.
+  // This avoids false-redirects when Vercel edge can't reach Supabase auth in time.
+  const { data: { session } } = await supabase.auth.getSession();
 
   const { pathname } = request.nextUrl;
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
   // Redirect unauthenticated users away from protected routes
-  if (isProtected && !user) {
+  if (isProtected && !session) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/auth";
     return NextResponse.redirect(loginUrl);
   }
 
   // Redirect logged-in users away from /auth back into the app
-  if (pathname === "/auth" && user) {
+  if (pathname === "/auth" && session) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = "/home";
     return NextResponse.redirect(homeUrl);
