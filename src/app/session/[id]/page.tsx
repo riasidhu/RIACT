@@ -51,8 +51,8 @@ export default function ActiveSessionPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      if (!authSession) { router.replace("/auth"); return; }
 
       const { data: sess } = await supabase.from("sessions").select("*").eq("id", id).single();
       if (!sess) return;
