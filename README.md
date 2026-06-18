@@ -2,7 +2,7 @@
 
 > AI-powered study habit tracker built for the **USAII Global Hackathon 2026** — Undergraduate Track, *AI for Life & Work*.
 
-**Live demo:** https://riact.vercel.app
+**Live demo:** https://riact-riasidhus-projects.vercel.app
 
 ---
 
