@@ -45,7 +45,7 @@ const features = [
 ];
 
 const steps = [
-  { num: "01", title: "Create a free account", desc: "Sign up with your university email in under 30 seconds." },
+  { num: "01", title: "Create a free account", desc: "Sign up with any email in under 30 seconds." },
   { num: "02", title: "Log a study session", desc: "Pick a location, hit start, take breaks, and end when you're done." },
   { num: "03", title: "Get AI insights", desc: "After 3 sessions, RIACT's AI starts coaching you with personalised tips." },
 ];
