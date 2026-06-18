@@ -146,6 +146,9 @@ Data: ${JSON.stringify(payload)}`,
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("Analyze API error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    const friendly = msg.includes("429")
+      ? "AI insights are temporarily unavailable. Please try again later."
+      : "Something went wrong generating your insights. Please try again.";
+    return NextResponse.json({ error: friendly }, { status: 500 });
   }
 }
