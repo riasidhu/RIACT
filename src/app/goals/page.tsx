@@ -6,7 +6,7 @@ import GoalProgressBars from "@/components/GoalProgressBar";
 import { createClient } from "@/lib/supabase";
 import { getGoalProgress } from "@/lib/goals";
 import type { Goal, Session } from "@/lib/types";
-import { CheckCircle, Clock, Plus, RotateCcw, Target } from "lucide-react";
+import { CheckCircle, Clock, Plus, RotateCcw, Target, Trash2 } from "lucide-react";
 
 export default function GoalsPage() {
   const supabase = createClient();
@@ -72,6 +72,12 @@ export default function GoalsPage() {
 
   async function handleDeactivate(id: string) {
     await supabase.from("goals").update({ is_active: false }).eq("id", id);
+    loadData();
+  }
+
+  async function handleDelete(id: string) {
+    if (!window.confirm("Are you sure you want to delete this goal? This can't be undone.")) return;
+    await supabase.from("goals").delete().eq("id", id);
     loadData();
   }
 
@@ -190,12 +196,21 @@ export default function GoalsPage() {
                       ) : null}
                     </span>
                   </div>
-                  <button
-                    onClick={() => handleDeactivate(g.id)}
-                    className="text-xs text-slate-400 hover:text-red-500 transition-colors font-medium"
-                  >
-                    Mark complete
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleDeactivate(g.id)}
+                      className="text-xs text-slate-400 hover:text-slate-600 transition-colors font-medium"
+                    >
+                      Mark complete
+                    </button>
+                    <button
+                      onClick={() => handleDelete(g.id)}
+                      className="flex items-center justify-center h-7 w-7 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors"
+                      title="Delete goal"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
