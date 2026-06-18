@@ -36,24 +36,24 @@ export default function AuthPage() {
     setDuplicateEmail(false);
     setLoading(true);
 
-    const { error: authError } = isSignUp
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
-
-    setLoading(false);
-
-    if (authError) {
-      const msg = authError.message.toLowerCase();
-      if (isSignUp && (msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already"))) {
+    if (isSignUp) {
+      const { data, error: authError } = await supabase.auth.signUp({ email, password });
+      setLoading(false);
+      if (authError) { setError(authError.message); return; }
+      // Supabase returns an empty identities array when email is already registered
+      if (!data.session && data.user?.identities?.length === 0) {
         setDuplicateEmail(true);
-      } else {
-        setError(authError.message);
+        return;
       }
-      return;
+      router.push("/home");
+      router.refresh();
+    } else {
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (authError) { setError(authError.message); return; }
+      router.push("/home");
+      router.refresh();
     }
-
-    router.push("/home");
-    router.refresh();
   }
 
   async function handleResetPassword() {
