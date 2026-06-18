@@ -9,7 +9,14 @@ import { createClient } from "@/lib/supabase";
 import { checkBurnout } from "@/lib/burnout";
 import { formatMinutes, sessionsInRange, getDayRange, getWeekRange } from "@/lib/utils";
 import type { Break, Goal, Session } from "@/lib/types";
-import { BarChart2, Calendar, Clock, MapPin, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart2, Brain, Calendar, Clock, MapPin, Sparkles, TrendingUp } from "lucide-react";
+
+interface WeeklyPlanDay {
+  day: string;
+  hours: number;
+  location: string;
+  focus: string;
+}
 
 function aggregateByLocation(sessions: Session[]) {
   const map = new Map<string, { net: number; total: number; breaks: number }>();
@@ -32,6 +39,8 @@ export default function DashboardPage() {
   const [selectedWeek, setSelectedWeek] = useState(format(new Date(), "yyyy-MM-dd"));
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [weeklyPlan, setWeeklyPlan] = useState<{ summary: string; days: WeeklyPlanDay[] } | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -110,6 +119,31 @@ export default function DashboardPage() {
       console.error("AI recommendations failed:", err);
     } finally {
       setLoadingRecs(false);
+    }
+  }
+
+  async function generateWeeklyPlan() {
+    setLoadingPlan(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 9000);
+      const res = await fetch("/api/weekly-plan", {
+        method: "POST",
+        signal: controller.signal,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ user_id: session.user.id }),
+      });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        setWeeklyPlan(data);
+      }
+    } catch (err) {
+      console.error("Weekly plan failed:", err);
+    } finally {
+      setLoadingPlan(false);
     }
   }
 
@@ -295,6 +329,66 @@ export default function DashboardPage() {
                 </ul>
               )}
             </div>
+          </div>
+
+          {/* AI Weekly Plan */}
+          <div className="mt-6 border-t border-slate-100 pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Brain size={15} className="text-pink-500" />
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">AI Study Plan</h3>
+              </div>
+              <button
+                onClick={generateWeeklyPlan}
+                disabled={loadingPlan}
+                className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-pink-500 to-pink-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-pink-200 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all"
+              >
+                <Brain size={11} />
+                {loadingPlan ? "Generating…" : weeklyPlan ? "Regenerate" : "Generate AI Plan"}
+              </button>
+            </div>
+
+            {loadingPlan && (
+              <p className="text-sm text-slate-400">Building your personalised plan…</p>
+            )}
+
+            {!loadingPlan && weeklyPlan && (
+              <div>
+                <p className="text-sm text-slate-600 mb-4 italic">{weeklyPlan.summary}</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-xs text-slate-400 uppercase tracking-wide border-b border-slate-100">
+                        <th className="text-left py-2 pr-4 font-medium">Day</th>
+                        <th className="text-left py-2 pr-4 font-medium">Hours</th>
+                        <th className="text-left py-2 pr-4 font-medium">Location</th>
+                        <th className="text-left py-2 font-medium">Focus Tip</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {weeklyPlan.days.map((d) => (
+                        <tr key={d.day} className={d.hours === 0 ? "opacity-40" : ""}>
+                          <td className="py-2.5 pr-4 font-semibold text-slate-800">{d.day.slice(0, 3)}</td>
+                          <td className="py-2.5 pr-4">
+                            {d.hours === 0 ? (
+                              <span className="text-slate-400">Rest</span>
+                            ) : (
+                              <span className="font-medium text-pink-500">{d.hours}h</span>
+                            )}
+                          </td>
+                          <td className="py-2.5 pr-4 text-slate-600">{d.location || "—"}</td>
+                          <td className="py-2.5 text-slate-500 text-xs">{d.focus}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {!loadingPlan && !weeklyPlan && (
+              <p className="text-sm text-slate-400">Click "Generate AI Plan" to get a personalised Mon–Sun study schedule based on your habits.</p>
+            )}
           </div>
         </div>
       </div>

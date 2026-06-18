@@ -11,6 +11,7 @@ import {
   Target,
   MapPin,
   BookOpen,
+  Brain,
   LogOut,
 } from "lucide-react";
 import RiactLogo from "@/components/RiactLogo";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/insights", label: "Insights", icon: Lightbulb },
+  { href: "/coach", label: "AI Coach", icon: Brain },
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/locations", label: "Locations", icon: MapPin },
   { href: "/resources", label: "Resources & FAQ", icon: BookOpen },
