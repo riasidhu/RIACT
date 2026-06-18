@@ -121,15 +121,11 @@ export async function POST(request: NextRequest) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       response_format: { type: "json_object" },
+      max_tokens: 400,
       messages: [
         {
-          role: "system",
-          content:
-            "You are a study coach for university students. Analyze study session data and respond ONLY with valid JSON.",
-        },
-        {
           role: "user",
-          content: `Analyze this student's study data and provide: 1) Pattern insights (best location and time of day), 2) Burnout risk assessment (low/medium/high) based on session length trends, break frequency changes, and late-night studying, 3) Three specific personalized recommendations. Format as JSON with keys: patterns, burnout_risk, burnout_signals, recommendations
+          content: `You are a study coach. Analyze this student data and respond with ONLY a JSON object with these exact keys: "patterns" (1 sentence about best study time/location), "burnout_risk" ("low", "medium", or "high"), "burnout_signals" (array of strings, can be empty), "recommendations" (array of exactly 3 short tips).
 
 Data: ${JSON.stringify(payload)}`,
         },

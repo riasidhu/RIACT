@@ -71,15 +71,24 @@ export default function InsightsPage() {
         setBreaks(brks ?? []);
         setGoals(gols ?? []);
 
-        // Send the JWT as Authorization header — avoids cookie-based auth on Vercel
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ user_id: user.id }),
-        });
+        // Abort after 9s — just under Vercel hobby's 10s function timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 9000);
+
+        let res: Response;
+        try {
+          res = await fetch("/api/analyze", {
+            method: "POST",
+            signal: controller.signal,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ user_id: user.id }),
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
 
         if (res.ok) {
           const data = await res.json();
