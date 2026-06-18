@@ -167,7 +167,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Top stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="rounded-xl border border-slate-100 bg-white shadow-sm p-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-50">
@@ -206,7 +206,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Pie chart */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="rounded-xl border border-slate-100 bg-white shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={15} className="text-pink-500" />
@@ -280,7 +280,7 @@ export default function DashboardPage() {
             {format(endOfWeek(weekDate, { weekStartsOn: 1 }), "MMM d")}
           </p>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="rounded-lg bg-slate-50 border border-slate-100 p-4">
               <p className="text-xs text-slate-400 mb-1">Net Study Time</p>
               <p className="text-2xl font-bold text-pink-500">
@@ -297,7 +297,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {weekAgg.size > 0 && (
               <div>
                 <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">By Location</h3>

@@ -89,7 +89,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
             Study smarter.<br />
             <span className="text-white/80">Beat burnout.</span>
           </h1>
@@ -167,7 +167,7 @@ export default function LandingPage() {
 
       {/* ── CTA ── */}
       <section className="py-20 px-6">
-        <div className="mx-auto max-w-2xl rounded-3xl bg-gradient-to-br from-pink-500 to-pink-600 p-12 text-center shadow-2xl shadow-pink-300/40">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-gradient-to-br from-pink-500 to-pink-600 p-8 md:p-12 text-center shadow-2xl shadow-pink-300/40">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to study smarter?</h2>
           <p className="text-pink-100 mb-8 text-sm leading-relaxed">
             Join students already using RIACT to track sessions, hit goals, and stay ahead of burnout.
