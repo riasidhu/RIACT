@@ -13,12 +13,15 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setDuplicateEmail(false);
     setLoading(true);
 
     const { error: authError } = isSignUp
@@ -28,12 +31,31 @@ export default function AuthPage() {
     setLoading(false);
 
     if (authError) {
-      setError(authError.message);
+      const msg = authError.message.toLowerCase();
+      if (isSignUp && (msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already"))) {
+        setDuplicateEmail(true);
+      } else {
+        setError(authError.message);
+      }
       return;
     }
 
     router.push("/home");
     router.refresh();
+  }
+
+  async function handleResetPassword() {
+    if (!email) {
+      setError("Enter your email above first.");
+      return;
+    }
+    setLoading(true);
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setLoading(false);
+    setResetSent(true);
+    setDuplicateEmail(false);
   }
 
   return (
@@ -60,8 +82,35 @@ export default function AuthPage() {
           </h2>
 
           {error && (
-            <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300">
+            <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
               {error}
+            </div>
+          )}
+
+          {duplicateEmail && (
+            <div className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+              An account already exists with this email.{" "}
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                className="font-semibold underline hover:text-amber-900 transition-colors"
+              >
+                Reset your password
+              </button>
+              {" "}or{" "}
+              <button
+                type="button"
+                onClick={() => { setIsSignUp(false); setDuplicateEmail(false); }}
+                className="font-semibold underline hover:text-amber-900 transition-colors"
+              >
+                log in instead
+              </button>.
+            </div>
+          )}
+
+          {resetSent && (
+            <div className="mb-4 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+              Password reset email sent! Check your inbox.
             </div>
           )}
 
@@ -74,7 +123,7 @@ export default function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300 transition-colors"
-                placeholder="you@university.edu"
+                placeholder="you@email.com"
               />
             </div>
 
@@ -100,13 +149,27 @@ export default function AuthPage() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-slate-500">
+          {!isSignUp && (
+            <p className="mt-3 text-center text-xs">
+              <button
+                type="button"
+                onClick={handleResetPassword}
+                className="text-slate-400 hover:text-pink-400 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </p>
+          )}
+
+          <p className="mt-4 text-center text-sm text-slate-500">
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
             <button
               type="button"
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError("");
+                setDuplicateEmail(false);
+                setResetSent(false);
               }}
               className="text-pink-400 hover:text-pink-300 transition-colors"
             >
