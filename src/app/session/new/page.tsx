@@ -70,13 +70,16 @@ export default function NewSessionPage() {
       locationId = created.id;
     }
 
+    // Use the current time at the moment "Start Session" is pressed, not page load time
+    const actualStart = new Date().toISOString();
+
     const { data: session, error: sessionError } = await supabase
       .from("sessions")
       .insert({
         user_id: user.id,
         location_id: locationId,
         location_name: locationName,
-        start_time: new Date(startTime).toISOString(),
+        start_time: actualStart,
         projected_end_time: new Date(projectedEnd).toISOString(),
       })
       .select()
@@ -143,20 +146,6 @@ export default function NewSessionPage() {
                   setSelectedLocation("");
                 }}
                 placeholder={locations.length > 0 ? "Or type a new location…" : "e.g. Library, Coffee Shop…"}
-                className={inputClass}
-              />
-            </div>
-
-            {/* Start time */}
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <Clock size={13} className="text-pink-400" />
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Start time</span>
-              </div>
-              <input
-                type="datetime-local"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
                 className={inputClass}
               />
             </div>
