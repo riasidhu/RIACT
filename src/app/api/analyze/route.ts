@@ -144,7 +144,8 @@ Data: ${JSON.stringify(payload)}`,
     const parsed = JSON.parse(content) as AnalysisResult;
     return NextResponse.json(parsed);
   } catch (err) {
-    console.error("Analyze API error:", err);
-    return NextResponse.json({ error: "Analysis failed" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("Analyze API error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
