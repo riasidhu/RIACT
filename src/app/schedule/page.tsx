@@ -5,7 +5,7 @@ import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from "date-fns";
 import AppLayout from "@/components/AppLayout";
 import { createClient } from "@/lib/supabase";
 import type { ScheduleClass } from "@/lib/types";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Pencil, Plus, Trash2, X } from "lucide-react";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -86,6 +86,10 @@ export default function SchedulePage() {
   const [validUntil, setValidUntil] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Edit state
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<Partial<ScheduleClass>>({});
+
   async function loadClasses() {
     const { data } = await supabase.from("schedule").select("*").order("day_of_week").order("start_time");
     setClasses(data ?? []);
@@ -125,6 +129,33 @@ export default function SchedulePage() {
   async function handleDelete(id: string) {
     if (!window.confirm("Remove this class from your schedule?")) return;
     await supabase.from("schedule").delete().eq("id", id);
+    loadClasses();
+  }
+
+  function startEdit(cls: ScheduleClass) {
+    setEditId(cls.id);
+    setEditFields({
+      course_name: cls.course_name,
+      day_of_week: cls.day_of_week,
+      start_time: cls.start_time,
+      end_time: cls.end_time,
+      location: cls.location ?? "",
+      valid_from: cls.valid_from ?? "",
+      valid_until: cls.valid_until ?? "",
+    });
+  }
+
+  async function handleSaveEdit(id: string) {
+    await supabase.from("schedule").update({
+      course_name: editFields.course_name,
+      day_of_week: editFields.day_of_week,
+      start_time: editFields.start_time,
+      end_time: editFields.end_time,
+      location: (editFields.location as string)?.trim() || null,
+      valid_from: (editFields.valid_from as string) || null,
+      valid_until: (editFields.valid_until as string) || null,
+    }).eq("id", id);
+    setEditId(null);
     loadClasses();
   }
 
@@ -349,8 +380,137 @@ export default function SchedulePage() {
 
         {classes.length > 0 && (
           <p className="mt-3 text-xs text-slate-400 text-center">
-            Hover a class block to delete it · The AI uses this schedule to plan study sessions around your classes
+            The AI uses this schedule to plan study sessions around your classes
           </p>
+        )}
+
+        {/* Manage all classes */}
+        {classes.length > 0 && (
+          <div className="mt-8 rounded-xl bg-white border border-slate-100 shadow-sm p-6">
+            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">All Classes</h2>
+            <ul className="space-y-2">
+              {classes.map((cls) => (
+                <li key={cls.id}>
+                  {editId === cls.id ? (
+                    /* Edit form */
+                    <div className="rounded-xl border border-pink-200 bg-pink-50/40 p-4 space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="block col-span-2">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Course name</span>
+                          <input
+                            type="text"
+                            value={editFields.course_name ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, course_name: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Day</span>
+                          <select
+                            value={editFields.day_of_week ?? "Monday"}
+                            onChange={(e) => setEditFields((f) => ({ ...f, day_of_week: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          >
+                            {DAYS.map((d) => <option key={d}>{d}</option>)}
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Location</span>
+                          <input
+                            type="text"
+                            value={editFields.location ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, location: e.target.value }))}
+                            placeholder="Optional"
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Start time</span>
+                          <input
+                            type="time"
+                            value={editFields.start_time ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, start_time: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">End time</span>
+                          <input
+                            type="time"
+                            value={editFields.end_time ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, end_time: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Active from</span>
+                          <input
+                            type="date"
+                            value={editFields.valid_from ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, valid_from: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Active until</span>
+                          <input
+                            type="date"
+                            value={editFields.valid_until ?? ""}
+                            onChange={(e) => setEditFields((f) => ({ ...f, valid_until: e.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+                          />
+                        </label>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveEdit(cls.id)}
+                          className="rounded-lg bg-pink-500 px-4 py-2 text-xs font-semibold text-white hover:bg-pink-400 transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditId(null)}
+                          className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Display row */
+                    <div className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-800">{cls.course_name}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {cls.day_of_week} · {fmt(cls.start_time)}–{fmt(cls.end_time)}
+                          {cls.location ? ` · ${cls.location}` : ""}
+                          {cls.valid_from || cls.valid_until
+                            ? ` · ${cls.valid_from ?? "—"} to ${cls.valid_until ?? "—"}`
+                            : " · Always active"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-3 shrink-0">
+                        <button
+                          onClick={() => startEdit(cls)}
+                          className="flex items-center justify-center h-7 w-7 rounded-lg text-slate-300 hover:bg-pink-50 hover:text-pink-500 transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cls.id)}
+                          className="flex items-center justify-center h-7 w-7 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors"
+                          title="Delete"
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </AppLayout>
