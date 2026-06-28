@@ -28,7 +28,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Goals and Progress Tracking** lets users set daily or weekly study hour targets, optionally tied to a specific location. Progress bars update in real time as sessions are logged, and goals can be marked complete or deleted with a confirmation prompt.
 
-**Class Schedule Integration** allows users to enter their university timetable — course name, day, start and end time, and classroom location. This schedule is passed as context to both the AI Coach and the Weekly Plan generator, so the AI never suggests studying during class hours and can plan sessions intelligently around lectures and tutorials.
+**Class Schedule Integration** allows users to enter their university timetable — course name, day, start and end time, and classroom location. Classes can be given active date ranges so a September semester schedule doesn't clutter the summer view. The timetable renders as a visual weekly grid with pink shaded blocks for class time, leaving white space that instantly shows available study windows. Users can skip a single week's occurrence of a class — for example to free up a Tuesday afternoon for revision — without deleting the recurring entry. The skipped block shows as faded and cancelled for that week, and can be restored with one click. This full schedule is passed as context to both the AI Coach and the Weekly Plan generator, so the AI never suggests studying during class hours and plans sessions intelligently around lectures and tutorials.
 
 **The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and AI recommendations inline in the weekly view.
 
