@@ -1,6 +1,6 @@
 # RIACT — Record, Insight, Analyze, Coach, Track
 
-> AI-powered study habit tracker built for the **USAII Global Hackathon 2026** — Undergraduate Track, *AI for Life & Work*.
+> AI-powered study habit tracker that helps students understand where and when they study best, detect burnout early, and get personalised AI coaching.
 
 **Live demo:** https://riact-riasidhus-projects.vercel.app
 
@@ -107,7 +107,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Team
 
-Built by **Ria Sidhu** for the USAII Global Hackathon 2026.
+Built by **Ria Sidhu**.
 
 ---
 
