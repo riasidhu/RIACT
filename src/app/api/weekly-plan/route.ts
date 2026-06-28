@@ -34,9 +34,10 @@ export async function POST(request: NextRequest) {
     );
 
     const since = subDays(new Date(), 30).toISOString();
-    const [{ data: sessions }, { data: goals }] = await Promise.all([
+    const [{ data: sessions }, { data: goals }, { data: schedule }] = await Promise.all([
       supabase.from("sessions").select("*").eq("user_id", user_id).gte("start_time", since).not("end_time", "is", null),
       supabase.from("goals").select("*").eq("user_id", user_id).eq("is_active", true),
+      supabase.from("schedule").select("*").eq("user_id", user_id).order("day_of_week").order("start_time"),
     ]);
 
     const context = {
@@ -46,16 +47,22 @@ export async function POST(request: NextRequest) {
         net_minutes: s.net_study_minutes,
       })),
       goals: (goals ?? []).map((g) => `${g.target_hours}h ${g.timeframe}${g.location_name ? ` at ${g.location_name}` : ""}`),
+      class_schedule: (schedule ?? []).map((c) => ({
+        course: c.course_name,
+        day: c.day_of_week,
+        time: `${c.start_time}–${c.end_time}`,
+        location: c.location ?? "unspecified",
+      })),
     };
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      max_tokens: 350,
+      max_tokens: 400,
       response_format: { type: "json_object" },
       messages: [
         {
           role: "user",
-          content: `Based on this student's study history and goals, generate a realistic study plan for the coming week. Return ONLY valid JSON with this exact shape:
+          content: `Based on this student's study history, goals, and class schedule, generate a realistic study plan for the coming week. Do NOT schedule study time during class hours. Return ONLY valid JSON with this exact shape:
 {
   "summary": "one sentence overview of the plan",
   "days": [
@@ -63,7 +70,7 @@ export async function POST(request: NextRequest) {
     ...all 7 days...
   ]
 }
-Use 0 hours for rest days. Base it on their patterns — don't just spread hours evenly.
+Use 0 hours for rest days. Base it on their patterns and work around their classes.
 
 Data: ${JSON.stringify(context)}`,
         },

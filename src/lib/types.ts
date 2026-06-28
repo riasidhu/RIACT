@@ -47,3 +47,14 @@ export interface BurnoutCheck {
   triggered: boolean;
   signals: string[];
 }
+
+export interface ScheduleClass {
+  id: string;
+  user_id: string;
+  course_name: string;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  location: string | null;
+  created_at: string;
+}

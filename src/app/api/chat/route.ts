@@ -34,9 +34,10 @@ export async function POST(request: NextRequest) {
     );
 
     const since = subDays(new Date(), 30).toISOString();
-    const [{ data: sessions }, { data: goals }] = await Promise.all([
+    const [{ data: sessions }, { data: goals }, { data: schedule }] = await Promise.all([
       supabase.from("sessions").select("*").eq("user_id", user_id).gte("start_time", since).not("end_time", "is", null),
       supabase.from("goals").select("*").eq("user_id", user_id).eq("is_active", true),
+      supabase.from("schedule").select("*").eq("user_id", user_id).order("day_of_week").order("start_time"),
     ]);
 
     const context = {
@@ -50,9 +51,15 @@ export async function POST(request: NextRequest) {
         target: `${g.target_hours}h ${g.timeframe}`,
         location: g.location_name ?? "any",
       })),
+      class_schedule: (schedule ?? []).map((c) => ({
+        course: c.course_name,
+        day: c.day_of_week,
+        time: `${c.start_time}–${c.end_time}`,
+        location: c.location ?? "unspecified",
+      })),
     };
 
-    const system = `You are RIACT Coach — a friendly, encouraging AI study coach built into the RIACT study tracking app. You have full context of the student's recent study sessions and goals. Give specific, data-driven advice. Be warm but concise — keep every reply under 120 words. Never make up data not in the context.
+    const system = `You are RIACT Coach — a friendly, encouraging AI study coach built into the RIACT study tracking app. You have full context of the student's recent study sessions, goals, and weekly class schedule. Give specific, data-driven advice. Be warm but concise — keep every reply under 120 words. When suggesting study times, avoid the student's class hours. Never make up data not in the context.
 
 Student context (last 30 days):
 ${JSON.stringify(context)}`;

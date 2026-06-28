@@ -12,6 +12,7 @@ import {
   MapPin,
   BookOpen,
   Brain,
+  CalendarDays,
   LogOut,
   Menu,
   X,
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/insights", label: "Insights", icon: Lightbulb },
   { href: "/coach", label: "AI Coach", icon: Brain },
   { href: "/goals", label: "Goals", icon: Target },
+  { href: "/schedule", label: "Class Schedule", icon: CalendarDays },
   { href: "/locations", label: "Locations", icon: MapPin },
   { href: "/resources", label: "Resources & FAQ", icon: BookOpen },
 ];
