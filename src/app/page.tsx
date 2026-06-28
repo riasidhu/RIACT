@@ -1,7 +1,7 @@
 import Link from "next/link";
 import RiactLogo from "@/components/RiactLogo";
 import LandingDemo from "@/components/LandingDemo";
-import { BookOpen, Brain, Flame, MapPin, Shield, Target } from "lucide-react";
+import { BookOpen, Brain, CalendarDays, Flame, MapPin, Shield, Target } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +37,12 @@ const features = [
     desc: "Every session is saved — review past weeks, compare locations, and spot your best days.",
   },
   {
+    icon: CalendarDays,
+    color: "bg-indigo-50 text-indigo-500",
+    title: "Class schedule integration",
+    desc: "Add your timetable and the AI plans study sessions around your classes — never during lecture hours.",
+  },
+  {
     icon: Shield,
     color: "bg-slate-50 text-slate-500",
     title: "Private & secure",
@@ -46,8 +52,9 @@ const features = [
 
 const steps = [
   { num: "01", title: "Create a free account", desc: "Sign up with any email in under 30 seconds." },
-  { num: "02", title: "Log a study session", desc: "Pick a location, hit start, take breaks, and end when you're done." },
-  { num: "03", title: "Get AI insights", desc: "After 3 sessions, RIACT's AI starts coaching you with personalised tips." },
+  { num: "02", title: "Add your timetable", desc: "Enter your class schedule so the AI knows when you're free to study." },
+  { num: "03", title: "Log study sessions", desc: "Pick a location, hit start, take breaks, and end when you're done." },
+  { num: "04", title: "Get AI coaching", desc: "After 3 sessions, RIACT's AI analyses your patterns and plans your week around your classes." },
 ];
 
 export default function LandingPage() {
@@ -131,7 +138,7 @@ export default function LandingPage() {
       <section className="bg-slate-50 py-20 px-6">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-12 text-center text-2xl font-bold text-slate-900">How it works</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => (
               <div key={step.num} className="rounded-2xl bg-white border border-slate-100 shadow-sm p-6">
                 <p className="text-4xl font-black text-pink-200 mb-3">{step.num}</p>

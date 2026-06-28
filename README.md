@@ -28,6 +28,8 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Goals and Progress Tracking** lets users set daily or weekly study hour targets, optionally tied to a specific location. Progress bars update in real time as sessions are logged, and goals can be marked complete or deleted with a confirmation prompt.
 
+**Class Schedule Integration** allows users to enter their university timetable — course name, day, start and end time, and classroom location. This schedule is passed as context to both the AI Coach and the Weekly Plan generator, so the AI never suggests studying during class hours and can plan sessions intelligently around lectures and tutorials.
+
 **The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and AI recommendations inline in the weekly view.
 
 ---
@@ -42,7 +44,7 @@ Data visualisation uses Recharts. Icons are from Lucide React. Date handling use
 
 ## AI Architecture
 
-When a user triggers an AI feature, a Next.js serverless API route fetches their last 30 days of sessions and active goals from Supabase using a Bearer-token authenticated client — meaning RLS applies server-side and the route can only access data belonging to the authenticated user. That data is formatted as structured context and passed to GPT-4o-mini with a task-specific prompt.
+When a user triggers an AI feature, a Next.js serverless API route fetches their last 30 days of sessions, active goals, and full class schedule from Supabase using a Bearer-token authenticated client — meaning RLS applies server-side and the route can only access data belonging to the authenticated user. That data is formatted as structured context and passed to GPT-4o-mini with a task-specific prompt.
 
 For the Insights page, the model returns personalised recommendation bullet points. For the Weekly Plan, the endpoint uses `response_format: json_object` to return a structured day-by-day schedule. For the AI Coach, the model receives the full conversation history alongside the session context and responds conversationally.
 
