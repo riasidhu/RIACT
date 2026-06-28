@@ -4,20 +4,74 @@ import { useEffect, useState } from "react";
 import AppLayout from "@/components/AppLayout";
 import { createClient } from "@/lib/supabase";
 import type { ScheduleClass } from "@/lib/types";
-import { CalendarDays, Clock, MapPin, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Plus, Trash2 } from "lucide-react";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// Timetable range: 8am – 10pm
+const START_HOUR = 8;
+const END_HOUR = 22;
+const TOTAL_HOURS = END_HOUR - START_HOUR;
+const PX_PER_HOUR = 56;
+
+function timeToMinutes(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
 
 function fmt(time: string) {
   const [h, m] = time.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
+  const ampm = h >= 12 ? "pm" : "am";
   const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+  return `${hour}${m === 0 ? "" : `:${String(m).padStart(2, "0")}`}${ampm}`;
+}
+
+function ClassBlock({ cls, onDelete }: { cls: ScheduleClass; onDelete: (id: string) => void }) {
+  const startMin = timeToMinutes(cls.start_time) - START_HOUR * 60;
+  const endMin = timeToMinutes(cls.end_time) - START_HOUR * 60;
+  const top = (startMin / 60) * PX_PER_HOUR;
+  const height = Math.max(((endMin - startMin) / 60) * PX_PER_HOUR, 24);
+
+  return (
+    <div
+      className="absolute inset-x-0.5 rounded-lg overflow-hidden group"
+      style={{ top, height }}
+    >
+      {/* Blurred busy background */}
+      <div className="absolute inset-0 bg-pink-400/30 backdrop-blur-[2px] border border-pink-300/60 rounded-lg" />
+      {/* Diagonal stripe overlay */}
+      <div
+        className="absolute inset-0 rounded-lg opacity-20"
+        style={{
+          backgroundImage: "repeating-linear-gradient(45deg, #ec4899 0px, #ec4899 1px, transparent 1px, transparent 8px)",
+        }}
+      />
+      {/* Content */}
+      <div className="relative h-full flex flex-col justify-between p-1.5">
+        <div className="min-h-0">
+          <p className="text-[10px] font-bold text-pink-800 leading-tight truncate">{cls.course_name}</p>
+          {height > 36 && (
+            <p className="text-[9px] text-pink-600 leading-tight mt-0.5">
+              {fmt(cls.start_time)}–{fmt(cls.end_time)}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => onDelete(cls.id)}
+          className="self-end opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded bg-pink-200/60 hover:bg-red-200 text-pink-700 hover:text-red-600"
+        >
+          <Trash2 size={9} />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function SchedulePage() {
   const supabase = createClient();
   const [classes, setClasses] = useState<ScheduleClass[]>([]);
+  const [showForm, setShowForm] = useState(false);
   const [courseName, setCourseName] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("Monday");
   const [startTime, setStartTime] = useState("09:00");
@@ -56,6 +110,7 @@ export default function SchedulePage() {
 
     setCourseName("");
     setLocation("");
+    setShowForm(false);
     setLoading(false);
     loadClasses();
   }
@@ -66,158 +121,183 @@ export default function SchedulePage() {
     loadClasses();
   }
 
-  // Group by day in order
-  const byDay = DAYS.reduce<Record<string, ScheduleClass[]>>((acc, day) => {
-    acc[day] = classes.filter((c) => c.day_of_week === day);
-    return acc;
-  }, {});
+  const hours = Array.from({ length: TOTAL_HOURS }, (_, i) => START_HOUR + i);
 
   const inputClass =
     "mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300 transition-colors";
 
   return (
     <AppLayout>
-      <div className="max-w-2xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Class Schedule</h1>
-          <p className="mt-1 text-slate-500 text-sm">
-            Add your classes so the AI can plan study sessions around your timetable
-          </p>
+      <div className="max-w-5xl">
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Class Schedule</h1>
+            <p className="mt-1 text-slate-500 text-sm">
+              Your timetable — shaded blocks are class time, open space is yours to study
+            </p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 transition-all"
+          >
+            <Plus size={14} />
+            Add class
+          </button>
         </div>
 
         {/* Add class form */}
-        <div className="rounded-xl bg-white border border-slate-100 shadow-sm p-6 mb-8">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-50">
-              <Plus size={15} className="text-pink-500" />
-            </div>
-            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Add a Class</h2>
-          </div>
-
-          <form onSubmit={handleCreate} className="space-y-4">
-            <label className="block">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Course name</span>
-              <input
-                type="text"
-                required
-                value={courseName}
-                onChange={(e) => setCourseName(e.target.value)}
-                placeholder="e.g. CMPT 120, Introduction to Psychology"
-                className={inputClass}
-              />
-            </label>
-
-            <div className="grid grid-cols-3 gap-4">
+        {showForm && (
+          <div className="rounded-xl bg-white border border-slate-100 shadow-sm p-6 mb-6">
+            <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">New Class</h2>
+            <form onSubmit={handleCreate} className="space-y-4">
               <label className="block">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Day</span>
-                <select
-                  value={dayOfWeek}
-                  onChange={(e) => setDayOfWeek(e.target.value)}
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Course name</span>
+                <input
+                  type="text"
+                  required
+                  value={courseName}
+                  onChange={(e) => setCourseName(e.target.value)}
+                  placeholder="e.g. CMPT 120, Introduction to Psychology"
                   className={inputClass}
+                  autoFocus
+                />
+              </label>
+
+              <div className="grid grid-cols-3 gap-4">
+                <label className="block">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Day</span>
+                  <select value={dayOfWeek} onChange={(e) => setDayOfWeek(e.target.value)} className={inputClass}>
+                    {DAYS.map((d) => <option key={d}>{d}</option>)}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Start</span>
+                  <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className={inputClass} />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">End</span>
+                  <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className={inputClass} />
+                </label>
+              </div>
+
+              <label className="block">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Location (optional)</span>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. AQ 3150, Online"
+                  className={inputClass}
+                />
+              </label>
+
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all"
                 >
-                  {DAYS.map((d) => <option key={d}>{d}</option>)}
-                </select>
-              </label>
+                  <Plus size={14} />
+                  {loading ? "Saving..." : "Add Class"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-              <label className="block">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Start time</span>
-                <input
-                  type="time"
-                  required
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-
-              <label className="block">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">End time</span>
-                <input
-                  type="time"
-                  required
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-            </div>
-
-            <label className="block">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Location (optional)</span>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. AQ 3150, Online"
-                className={inputClass}
-              />
-            </label>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all"
-            >
-              <Plus size={14} />
-              {loading ? "Saving..." : "Add Class"}
-            </button>
-          </form>
+        {/* Legend */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-pink-300/50 border border-pink-300" />
+            <span className="text-xs text-slate-500">Class (unavailable)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-white border border-slate-200" />
+            <span className="text-xs text-slate-500">Free — study window</span>
+          </div>
         </div>
 
-        {/* Weekly timetable */}
-        {classes.length === 0 ? (
-          <div className="rounded-xl bg-slate-50 border border-slate-100 p-8 text-center">
-            <CalendarDays size={24} className="text-slate-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-slate-700 mb-1">No classes added yet</p>
-            <p className="text-xs text-slate-400">Add your timetable above so the AI can schedule around your classes.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {DAYS.map((day) => {
-              const dayClasses = byDay[day];
-              if (dayClasses.length === 0) return null;
-              return (
-                <div key={day} className="rounded-xl bg-white border border-slate-100 shadow-sm p-5">
-                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">{day}</h3>
-                  <ul className="space-y-2">
-                    {dayClasses.map((cls) => (
-                      <li
-                        key={cls.id}
-                        className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-pink-50">
-                            <CalendarDays size={12} className="text-pink-500" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{cls.course_name}</p>
-                            <div className="flex items-center gap-3 mt-0.5">
-                              <span className="flex items-center gap-1 text-xs text-slate-400">
-                                <Clock size={10} />
-                                {fmt(cls.start_time)} – {fmt(cls.end_time)}
-                              </span>
-                              {cls.location && (
-                                <span className="flex items-center gap-1 text-xs text-slate-400">
-                                  <MapPin size={10} />
-                                  {cls.location}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleDelete(cls.id)}
-                          className="ml-3 flex items-center justify-center h-7 w-7 shrink-0 rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+        {/* Timetable grid */}
+        <div className="rounded-xl bg-white border border-slate-100 shadow-sm overflow-hidden">
+          {classes.length === 0 && (
+            <div className="p-12 text-center">
+              <CalendarDays size={28} className="text-slate-200 mx-auto mb-3" />
+              <p className="text-sm font-medium text-slate-600 mb-1">No classes added yet</p>
+              <p className="text-xs text-slate-400">Click "Add class" above to fill in your timetable.</p>
+            </div>
+          )}
+
+          {classes.length > 0 && (
+            <div className="overflow-x-auto">
+              <div style={{ minWidth: 600 }}>
+                {/* Day headers */}
+                <div className="flex border-b border-slate-100">
+                  <div className="w-12 shrink-0" />
+                  {DAYS.map((day, i) => (
+                    <div key={day} className="flex-1 py-3 text-center border-l border-slate-100 first:border-l-0">
+                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{DAY_SHORT[i]}</span>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Time grid */}
+                <div className="flex">
+                  {/* Hour labels */}
+                  <div className="w-12 shrink-0 relative" style={{ height: TOTAL_HOURS * PX_PER_HOUR }}>
+                    {hours.map((h) => (
+                      <div
+                        key={h}
+                        className="absolute right-2 text-[10px] text-slate-300 font-medium"
+                        style={{ top: (h - START_HOUR) * PX_PER_HOUR - 6 }}
+                      >
+                        {h % 12 || 12}{h < 12 ? "a" : "p"}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Day columns */}
+                  {DAYS.map((day) => {
+                    const dayClasses = classes.filter((c) => c.day_of_week === day);
+                    return (
+                      <div
+                        key={day}
+                        className="flex-1 relative border-l border-slate-100"
+                        style={{ height: TOTAL_HOURS * PX_PER_HOUR }}
+                      >
+                        {/* Hour grid lines */}
+                        {hours.map((h) => (
+                          <div
+                            key={h}
+                            className="absolute inset-x-0 border-t border-slate-50"
+                            style={{ top: (h - START_HOUR) * PX_PER_HOUR }}
+                          />
+                        ))}
+
+                        {/* Class blocks */}
+                        {dayClasses.map((cls) => (
+                          <ClassBlock key={cls.id} cls={cls} onDelete={handleDelete} />
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {classes.length > 0 && (
+          <p className="mt-3 text-xs text-slate-400 text-center">
+            Hover over a class block to delete it · The AI uses this timetable to plan study sessions around your classes
+          </p>
         )}
       </div>
     </AppLayout>
