@@ -56,5 +56,7 @@ export interface ScheduleClass {
   start_time: string;
   end_time: string;
   location: string | null;
+  valid_from: string | null;
+  valid_until: string | null;
   created_at: string;
 }

@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from "date-fns";
 import AppLayout from "@/components/AppLayout";
 import { createClient } from "@/lib/supabase";
 import type { ScheduleClass } from "@/lib/types";
-import { CalendarDays, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// Timetable range: 8am – 10pm
 const START_HOUR = 8;
 const END_HOUR = 22;
 const TOTAL_HOURS = END_HOUR - START_HOUR;
@@ -27,6 +27,15 @@ function fmt(time: string) {
   return `${hour}${m === 0 ? "" : `:${String(m).padStart(2, "0")}`}${ampm}`;
 }
 
+function isActiveInWeek(cls: ScheduleClass, weekStart: Date, weekEnd: Date): boolean {
+  if (!cls.valid_from && !cls.valid_until) return true;
+  const from = cls.valid_from ? new Date(cls.valid_from + "T00:00:00") : null;
+  const until = cls.valid_until ? new Date(cls.valid_until + "T00:00:00") : null;
+  if (from && from > weekEnd) return false;
+  if (until && until < weekStart) return false;
+  return true;
+}
+
 function ClassBlock({ cls, onDelete }: { cls: ScheduleClass; onDelete: (id: string) => void }) {
   const startMin = timeToMinutes(cls.start_time) - START_HOUR * 60;
   const endMin = timeToMinutes(cls.end_time) - START_HOUR * 60;
@@ -34,27 +43,20 @@ function ClassBlock({ cls, onDelete }: { cls: ScheduleClass; onDelete: (id: stri
   const height = Math.max(((endMin - startMin) / 60) * PX_PER_HOUR, 24);
 
   return (
-    <div
-      className="absolute inset-x-0.5 rounded-lg overflow-hidden group"
-      style={{ top, height }}
-    >
-      {/* Blurred busy background */}
+    <div className="absolute inset-x-0.5 rounded-lg overflow-hidden group" style={{ top, height }}>
       <div className="absolute inset-0 bg-pink-400/30 backdrop-blur-[2px] border border-pink-300/60 rounded-lg" />
-      {/* Diagonal stripe overlay */}
       <div
         className="absolute inset-0 rounded-lg opacity-20"
-        style={{
-          backgroundImage: "repeating-linear-gradient(45deg, #ec4899 0px, #ec4899 1px, transparent 1px, transparent 8px)",
-        }}
+        style={{ backgroundImage: "repeating-linear-gradient(45deg, #ec4899 0px, #ec4899 1px, transparent 1px, transparent 8px)" }}
       />
-      {/* Content */}
       <div className="relative h-full flex flex-col justify-between p-1.5">
         <div className="min-h-0">
           <p className="text-[10px] font-bold text-pink-800 leading-tight truncate">{cls.course_name}</p>
           {height > 36 && (
-            <p className="text-[9px] text-pink-600 leading-tight mt-0.5">
-              {fmt(cls.start_time)}–{fmt(cls.end_time)}
-            </p>
+            <p className="text-[9px] text-pink-600 leading-tight mt-0.5">{fmt(cls.start_time)}–{fmt(cls.end_time)}</p>
+          )}
+          {height > 52 && cls.location && (
+            <p className="text-[9px] text-pink-500 leading-tight truncate">{cls.location}</p>
           )}
         </div>
         <button
@@ -72,19 +74,20 @@ export default function SchedulePage() {
   const supabase = createClient();
   const [classes, setClasses] = useState<ScheduleClass[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+
+  // Form state
   const [courseName, setCourseName] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("Monday");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
+  const [validFrom, setValidFrom] = useState("");
+  const [validUntil, setValidUntil] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function loadClasses() {
-    const { data } = await supabase
-      .from("schedule")
-      .select("*")
-      .order("day_of_week")
-      .order("start_time");
+    const { data } = await supabase.from("schedule").select("*").order("day_of_week").order("start_time");
     setClasses(data ?? []);
   }
 
@@ -106,10 +109,14 @@ export default function SchedulePage() {
       start_time: startTime,
       end_time: endTime,
       location: location.trim() || null,
+      valid_from: validFrom || null,
+      valid_until: validUntil || null,
     });
 
     setCourseName("");
     setLocation("");
+    setValidFrom("");
+    setValidUntil("");
     setShowForm(false);
     setLoading(false);
     loadClasses();
@@ -121,6 +128,8 @@ export default function SchedulePage() {
     loadClasses();
   }
 
+  const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+  const activeClasses = classes.filter((c) => isActiveInWeek(c, weekStart, weekEnd));
   const hours = Array.from({ length: TOTAL_HOURS }, (_, i) => START_HOUR + i);
 
   const inputClass =
@@ -134,7 +143,7 @@ export default function SchedulePage() {
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Class Schedule</h1>
             <p className="mt-1 text-slate-500 text-sm">
-              Your timetable — shaded blocks are class time, open space is yours to study
+              Shaded blocks are class time — open space is yours to study
             </p>
           </div>
           <button
@@ -192,6 +201,22 @@ export default function SchedulePage() {
                 />
               </label>
 
+              {/* Date range */}
+              <div>
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Active dates (optional)</span>
+                <p className="text-xs text-slate-400 mb-2 mt-0.5">Leave blank to always show this class. Set a range if it only applies to a specific semester or term.</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className="text-xs text-slate-400">From</span>
+                    <input type="date" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} className={inputClass} />
+                  </label>
+                  <label className="block">
+                    <span className="text-xs text-slate-400">Until</span>
+                    <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className={inputClass} />
+                  </label>
+                </div>
+              </div>
+
               <div className="flex gap-3">
                 <button
                   type="submit"
@@ -213,42 +238,67 @@ export default function SchedulePage() {
           </div>
         )}
 
-        {/* Legend */}
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded bg-pink-300/50 border border-pink-300" />
-            <span className="text-xs text-slate-500">Class (unavailable)</span>
+        {/* Week navigator */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setWeekStart((w) => subWeeks(w, 1))}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+            >
+              <ChevronLeft size={14} className="text-slate-500" />
+            </button>
+            <div className="px-4 py-1.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 bg-white">
+              {format(weekStart, "MMM d")} – {format(weekEnd, "MMM d, yyyy")}
+            </div>
+            <button
+              onClick={() => setWeekStart((w) => addWeeks(w, 1))}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+            >
+              <ChevronRight size={14} className="text-slate-500" />
+            </button>
+            <button
+              onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+              className="ml-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors"
+            >
+              Today
+            </button>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded bg-white border border-slate-200" />
-            <span className="text-xs text-slate-500">Free — study window</span>
+
+          {/* Legend */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="h-3 w-3 rounded bg-pink-300/50 border border-pink-300" />
+              <span className="text-xs text-slate-400">Class</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="h-3 w-3 rounded bg-white border border-slate-200" />
+              <span className="text-xs text-slate-400">Study window</span>
+            </div>
           </div>
         </div>
 
-        {/* Timetable grid */}
+        {/* Timetable */}
         <div className="rounded-xl bg-white border border-slate-100 shadow-sm overflow-hidden">
-          {classes.length === 0 && (
+          {classes.length === 0 ? (
             <div className="p-12 text-center">
               <CalendarDays size={28} className="text-slate-200 mx-auto mb-3" />
               <p className="text-sm font-medium text-slate-600 mb-1">No classes added yet</p>
-              <p className="text-xs text-slate-400">Click "Add class" above to fill in your timetable.</p>
+              <p className="text-xs text-slate-400">Click "Add class" to fill in your timetable.</p>
             </div>
-          )}
-
-          {classes.length > 0 && (
+          ) : (
             <div className="overflow-x-auto">
               <div style={{ minWidth: 600 }}>
                 {/* Day headers */}
                 <div className="flex border-b border-slate-100">
                   <div className="w-12 shrink-0" />
                   {DAYS.map((day, i) => (
-                    <div key={day} className="flex-1 py-3 text-center border-l border-slate-100 first:border-l-0">
+                    <div key={day} className="flex-1 py-3 text-center border-l border-slate-100">
                       <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{DAY_SHORT[i]}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Time grid */}
+                {/* Grid */}
                 <div className="flex">
                   {/* Hour labels */}
                   <div className="w-12 shrink-0 relative" style={{ height: TOTAL_HOURS * PX_PER_HOUR }}>
@@ -265,14 +315,13 @@ export default function SchedulePage() {
 
                   {/* Day columns */}
                   {DAYS.map((day) => {
-                    const dayClasses = classes.filter((c) => c.day_of_week === day);
+                    const dayClasses = activeClasses.filter((c) => c.day_of_week === day);
                     return (
                       <div
                         key={day}
                         className="flex-1 relative border-l border-slate-100"
                         style={{ height: TOTAL_HOURS * PX_PER_HOUR }}
                       >
-                        {/* Hour grid lines */}
                         {hours.map((h) => (
                           <div
                             key={h}
@@ -280,8 +329,6 @@ export default function SchedulePage() {
                             style={{ top: (h - START_HOUR) * PX_PER_HOUR }}
                           />
                         ))}
-
-                        {/* Class blocks */}
                         {dayClasses.map((cls) => (
                           <ClassBlock key={cls.id} cls={cls} onDelete={handleDelete} />
                         ))}
@@ -294,9 +341,15 @@ export default function SchedulePage() {
           )}
         </div>
 
+        {classes.length > 0 && activeClasses.length === 0 && (
+          <p className="mt-4 text-center text-sm text-slate-400">
+            No classes active during this week — navigate to a different week or check your active date ranges.
+          </p>
+        )}
+
         {classes.length > 0 && (
           <p className="mt-3 text-xs text-slate-400 text-center">
-            Hover over a class block to delete it · The AI uses this timetable to plan study sessions around your classes
+            Hover a class block to delete it · The AI uses this schedule to plan study sessions around your classes
           </p>
         )}
       </div>
