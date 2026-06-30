@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { differenceInSeconds, parseISO } from "date-fns";
+import { differenceInSeconds, parseISO, subHours } from "date-fns";
 import { Coffee, MapPin, Square } from "lucide-react";
 
 function formatTimer(seconds: number): string {
@@ -31,6 +31,7 @@ interface ActiveBreak {
 export default function ActiveSessionBanner() {
   const supabase = createClient();
   const router = useRouter();
+  const pathname = usePathname();
   const [session, setSession] = useState<ActiveSession | null>(null);
   const [breaks, setBreaks] = useState<ActiveBreak[]>([]);
   const [elapsed, setElapsed] = useState(0);
@@ -56,16 +57,22 @@ export default function ActiveSessionBanner() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSession(null); return; }
 
+    // Only look at sessions started in the last 24 hours to avoid surfacing
+    // old sessions that were never closed during testing
+    const since = subHours(new Date(), 24).toISOString();
+
     const { data: sess } = await supabase
       .from("sessions")
       .select("id, location_name, start_time, end_time")
       .eq("user_id", user.id)
       .is("end_time", null)
+      .gte("start_time", since)
       .order("start_time", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (!sess) { setSession(null); return; }
+    // Extra client-side guard in case the null filter leaks
+    if (!sess || sess.end_time) { setSession(null); return; }
 
     const { data: brks } = await supabase
       .from("breaks")
@@ -83,7 +90,7 @@ export default function ActiveSessionBanner() {
     const poll = setInterval(fetchActive, 30_000);
     return () => clearInterval(poll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]); // re-fetch on navigation so banner clears after ending a session
 
   useEffect(() => {
     if (!session) return;
@@ -101,6 +108,7 @@ export default function ActiveSessionBanner() {
   }
 
   if (!session) return null;
+  if (pathname === `/session/${session.id}`) return null;
 
   const onBreak = breaks.some((b) => !b.end_time);
 
