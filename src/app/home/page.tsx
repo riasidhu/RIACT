@@ -5,7 +5,8 @@ import AppLayout from "@/components/AppLayout";
 import GoalProgressBars from "@/components/GoalProgressBar";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getGoalProgress } from "@/lib/goals";
-import { formatMinutes, formatTime, isToday } from "@/lib/utils";
+import { formatMinutes, isToday } from "@/lib/utils";
+import LocalTime from "@/components/LocalTime";
 import type { Session } from "@/lib/types";
 import { BookOpen, Clock, MapPin, Plus, TrendingUp, Flame, Brain, Target, Lightbulb } from "lucide-react";
 
@@ -174,7 +175,7 @@ export default async function HomePage() {
                         <div>
                           <p className="text-sm font-medium text-slate-800">{session.location_name}</p>
                           <p className="text-xs text-slate-400">
-                            {formatTime(session.start_time)} – {session.end_time ? formatTime(session.end_time) : "—"}
+                            <LocalTime iso={session.start_time} /> – <LocalTime iso={session.end_time} />
                           </p>
                         </div>
                       </div>
