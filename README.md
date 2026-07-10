@@ -10,7 +10,7 @@
 
 Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9am actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
 
-RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and after just three sessions starts using AI to surface patterns, detect risk signals, and give coaching that's grounded in the user's own data rather than generic advice.
+RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and after just three sessions starts using AI to surface patterns, detect risk signals and give coaching that's grounded in the user's own data rather than generic advice.
 
 ---
 
@@ -22,7 +22,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning banner when enough signals are present. Critically, this system is entirely separate from the AI. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The user decides what it means.
 
-**The AI Study Coach** is a live chat interface where users can ask anything about their study habits. The model receives the last 30 days of sessions and active goals as context with every message, so its answers are grounded in real data. Ask it when your best study window is, whether your current patterns suggest burnout risk, or what you should prioritise this week — and it responds with answers specific to you, not generic study tips.
+**The AI Study Coach** is a live chat interface where users can ask anything about their study habits. The model receives the last 30 days of sessions and active goals as context with every message, so its answers are grounded in real data. Ask it when your best study window is, whether your current patterns suggest burnout risk or what you should prioritise this week — and it responds with answers specific to you, not generic study tips.
 
 **The AI Weekly Plan** generates a personalised Monday-to-Sunday study schedule based on historical patterns. Rather than spreading hours evenly across the week, the model analyses which days and locations have historically produced the most focused work and builds a realistic plan around that. Each day includes a recommended location, a target number of hours, and a short focus tip. Rest days are included — recovery is part of studying smarter, not just working harder.
 
