@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use or reference RIACT, please cite the preprint below."
+title: "RIACT — Record, Insight, Analyze, Coach, Track"
+authors:
+  - family-names: Sidhu
+    given-names: Ria
+type: software
+url: "https://riact-riasidhus-projects.vercel.app"
+repository-code: "https://github.com/riasidhu/USAII-hackathon"
+preferred-citation:
+  type: article
+  title: "RIACT: A Responsible AI System for Personalized Study Habit Tracking and Early Burnout Signal Detection in University Students"
+  authors:
+    - family-names: Sidhu
+      given-names: Ria
+  year: 2026
+  doi: "10.35542/osf.io/94hr5_v1"
+  journal: "EdArXiv"

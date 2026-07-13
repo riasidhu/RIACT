@@ -1,5 +1,7 @@
 # RIACT — Record, Insight, Analyze, Coach, Track
 
+[![DOI](https://img.shields.io/badge/DOI-10.35542%2Fosf.io%2F94hr5__v1-blue)](https://doi.org/10.35542/osf.io/94hr5_v1)
+
 **RIACT is an AI-powered study habit tracker that helps students understand where and when they study best, detect burnout before it hits and get personalised coaching from an AI that knows their data.**
 
 **Live demo:** https://riact-riasidhus-projects.vercel.app
@@ -85,6 +87,16 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Citation
+
+RIACT is described in a peer-viewable preprint:
+
+> Sidhu, R. (2026). *RIACT: A responsible AI system for personalized study habit tracking and early burnout signal detection in university students.* EdArXiv. https://doi.org/10.35542/osf.io/94hr5_v1
+
+If you use or reference RIACT, please cite the preprint (see also `CITATION.cff`).
 
 ---
 
