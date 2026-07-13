@@ -6,7 +6,7 @@ authors:
     given-names: Ria
 type: software
 url: "https://riact-riasidhus-projects.vercel.app"
-repository-code: "https://github.com/riasidhu/USAII-hackathon"
+repository-code: "https://github.com/riasidhu/RIACT"
 preferred-citation:
   type: article
   title: "RIACT: A Responsible AI System for Personalized Study Habit Tracking and Early Burnout Signal Detection in University Students"
