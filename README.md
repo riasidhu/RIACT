@@ -1,6 +1,6 @@
 # RIACT — Record, Insight, Analyze, Coach, Track
 
-**RIACT is an AI-powered study habit tracker that helps students understand where and when they study best, detect burnout before it hits, and get personalised coaching from an AI that knows their data.**
+**RIACT is an AI-powered study habit tracker that helps students understand where and when they study best, detect burnout before it hits and get personalised coaching from an AI that knows their data.**
 
 **Live demo:** https://riact-riasidhus-projects.vercel.app
 
@@ -36,7 +36,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 ## Tech Stack
 
-RIACT is built on **Next.js 16** with the App Router, TypeScript throughout, and Tailwind CSS for styling. The database and authentication layer is **Supabase** — PostgreSQL under the hood, with row-level security on every table so users can only ever query their own data. The AI features run through the **OpenAI API** using GPT-4o-mini. Everything is deployed on **Vercel**.
+RIACT is built on **Next.js 16** with the App Router, TypeScript throughout and Tailwind CSS for styling. The database and authentication layer is **Supabase** — PostgreSQL under the hood, with row-level security on every table so users can only ever query their own data. The AI features run through the **OpenAI API** using GPT-4o-mini. Everything is deployed on **Vercel**.
 
 Data visualisation uses Recharts. Icons are from Lucide React. Date handling uses date-fns.
 
