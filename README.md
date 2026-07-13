@@ -10,7 +10,7 @@
 
 ## The Problem
 
-Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9am actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
+Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9AM actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
 
 RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and after just three sessions starts using AI to surface patterns, detect risk signals and give coaching that's grounded in the user's own data rather than generic advice.
 
