@@ -113,9 +113,9 @@ export default function ActiveSessionBanner() {
   const onBreak = breaks.some((b) => !b.end_time);
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md md:left-[calc(130px+50%)] md:-translate-x-1/2">
+    <div className="fixed bottom-4 left-4 right-4 md:left-[276px] z-50 flex justify-center">
       <div
-        className={`flex items-center gap-3 rounded-2xl px-4 py-3 shadow-2xl shadow-pink-500/20 border ${
+        className={`flex items-center gap-3 rounded-2xl px-4 py-3 shadow-2xl shadow-pink-500/20 border w-full max-w-sm ${
           onBreak
             ? "bg-amber-50 border-amber-200"
             : "bg-white border-pink-200"
