@@ -8,25 +8,6 @@
 
 ---
 
-## Screenshots
-
-<img src="screenshots/home.png" alt="Home page with active session banner" width="100%" />
-
-<br/>
-
-<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="100%" />
-
-<br/>
-
-<table>
-  <tr>
-    <td><img src="screenshots/weekly-report.png" alt="Weekly report and AI study plan" width="100%" /></td>
-    <td><img src="screenshots/insights.png" alt="AI recommendations, burnout risk and resources" width="100%" /></td>
-  </tr>
-</table>
-
----
-
 ## The Problem
 
 Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9AM actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
@@ -37,21 +18,37 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 ## What It Does
 
-**Session Tracking** is the foundation. Users start a session at any location — a library, a café, home — and RIACT runs a live timer. Breaks can be recorded mid-session, and when the session ends the user sees a full breakdown: start time, end time, every break, net study time versus total time at that location. Everything is editable before saving, and nothing gets locked in without the user's sign-off.
+**Session Tracking** is the foundation. Users start a session at any location — a library, a café, home — and RIACT runs a live timer. Breaks can be recorded mid-session, and when the session ends the user sees a full breakdown: start time, end time, every break, net study time versus total time at that location. Everything is editable before saving, and nothing gets locked in without the user's sign-off. An active session banner persists across every page so you can always see your live timer and return to it no matter where you navigate.
 
-**AI Insights** unlock after three sessions. The Insights page sends the user's session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that a user consistently produces their best net study time on Tuesday mornings at the library, it says so specifically — not generically.
+<img src="screenshots/home.png" alt="Home page with active session banner" width="100%" />
 
-**Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning banner when enough signals are present. Critically, this system is entirely separate from the AI. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The user decides what it means.
+---
 
-**The AI Study Coach** is a live chat interface where users can ask anything about their study habits. The model receives the last 30 days of sessions and active goals as context with every message, so its answers are grounded in real data. Ask it when your best study window is, whether your current patterns suggest burnout risk or what you should prioritise this week — and it responds with answers specific to you, not generic study tips.
+**The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and a burnout warning banner when signals are detected in your data.
+
+<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="100%" />
+
+---
+
+**AI Insights** unlock after three sessions. The Insights page sends your session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that you consistently produce your best net study time on Tuesday mornings at the library, it says so specifically — not generically.
+
+**Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning when enough signals are present. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The student decides what it means.
+
+<img src="screenshots/insights.png" alt="AI recommendations, burnout risk and resources" width="100%" />
+
+---
 
 **The AI Weekly Plan** generates a personalised Monday-to-Sunday study schedule based on historical patterns. Rather than spreading hours evenly across the week, the model analyses which days and locations have historically produced the most focused work and builds a realistic plan around that. Each day includes a recommended location, a target number of hours, and a short focus tip. Rest days are included — recovery is part of studying smarter, not just working harder.
 
-**Goals and Progress Tracking** lets users set daily or weekly study hour targets, optionally tied to a specific location. Progress bars update in real time as sessions are logged, and goals can be marked complete or deleted with a confirmation prompt.
+**Goals and Progress Tracking** lets users set daily or weekly study hour targets, optionally tied to a specific location. Progress bars update in real time as sessions are logged.
 
-**Class Schedule Integration** allows users to enter their university timetable — course name, day, start and end time, and classroom location. Classes can be given active date ranges so a September semester schedule doesn't clutter the summer view. The timetable renders as a visual weekly grid with pink shaded blocks for class time, leaving white space that instantly shows available study windows. Users can skip a single week's occurrence of a class — for example to free up a Tuesday afternoon for revision — without deleting the recurring entry. The skipped block shows as faded and cancelled for that week, and can be restored with one click. This full schedule is passed as context to both the AI Coach and the Weekly Plan generator, so the AI never suggests studying during class hours and plans sessions intelligently around lectures and tutorials.
+<img src="screenshots/weekly-report.png" alt="Weekly report and AI study plan" width="100%" />
 
-**The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and AI recommendations inline in the weekly view.
+---
+
+**The AI Study Coach** is a live chat interface where users can ask anything about their study habits. The model receives the last 30 days of sessions, active goals, and your full class schedule as context with every message, so its answers are grounded in real data rather than generic advice.
+
+**Class Schedule Integration** allows users to enter their university timetable — course name, day, start and end time, and classroom location. Classes can be given active date ranges so a September semester schedule doesn't clutter the summer view. The timetable renders as a visual weekly grid with shaded blocks for class time, leaving white space that instantly shows available study windows. Users can skip a single week's occurrence without deleting the recurring entry. The full schedule is passed as context to both the AI Coach and the Weekly Plan generator, so the AI never suggests studying during class hours.
 
 ---
 
