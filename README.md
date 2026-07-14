@@ -1,6 +1,6 @@
 # RIACT — Record, Insight, Analyze, Coach, Track
 
-[![DOI](https://img.shields.io/badge/DOI-10.35542%2Fosf.io%2F94hr5__v1-blue)](https://doi.org/10.35542/osf.io/94hr5_v1)
+[![DOI](https://img.shields.io/badge/DOI-10.35542%2Fosf.io%2F94hr5__v1-blue)](https://doi.org/10.35542/osf.io/94hr5_v1) [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com) [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?logo=openai&logoColor=white)](https://openai.com) [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://riact-riasidhus-projects.vercel.app)
 
 **RIACT is an AI-powered study habit tracker that helps students understand where and when they study best, detect burnout before it hits and get personalised coaching from an AI that knows their data.**
 
