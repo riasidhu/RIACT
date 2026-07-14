@@ -8,6 +8,25 @@
 
 ---
 
+## Screenshots
+
+<img src="screenshots/home.png" alt="Home page with active session banner" width="100%" />
+
+<br/>
+
+<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="100%" />
+
+<br/>
+
+<table>
+  <tr>
+    <td><img src="screenshots/weekly-report.png" alt="Weekly report and AI study plan" width="100%" /></td>
+    <td><img src="screenshots/insights.png" alt="AI recommendations, burnout risk and resources" width="100%" /></td>
+  </tr>
+</table>
+
+---
+
 ## The Problem
 
 Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9AM actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
