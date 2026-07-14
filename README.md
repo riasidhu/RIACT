@@ -20,13 +20,13 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Session Tracking** is the foundation. Users start a session at any location — a library, a café, home — and RIACT runs a live timer. Breaks can be recorded mid-session, and when the session ends the user sees a full breakdown: start time, end time, every break, net study time versus total time at that location. Everything is editable before saving, and nothing gets locked in without the user's sign-off. An active session banner persists across every page so you can always see your live timer and return to it no matter where you navigate.
 
-<img src="screenshots/home.png" alt="Home page with active session banner" width="100%" />
+<img src="screenshots/home.png" alt="Home page with active session banner" width="70%" />
 
 ---
 
 **The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and a burnout warning banner when signals are detected in your data.
 
-<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="100%" />
+<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="70%" />
 
 ---
 
@@ -34,7 +34,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning when enough signals are present. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The student decides what it means.
 
-<img src="screenshots/insights.png" alt="AI recommendations, burnout risk and resources" width="100%" />
+<img src="screenshots/insights.png" alt="AI recommendations, burnout risk and resources" width="70%" />
 
 ---
 
@@ -42,7 +42,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **Goals and Progress Tracking** lets users set daily or weekly study hour targets, optionally tied to a specific location. Progress bars update in real time as sessions are logged.
 
-<img src="screenshots/weekly-report.png" alt="Weekly report and AI study plan" width="100%" />
+<img src="screenshots/weekly-report.png" alt="Weekly report and AI study plan" width="70%" />
 
 ---
 
