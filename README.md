@@ -26,7 +26,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 **The Dashboard** brings everything together — all-time hours, weekly stats, a location breakdown pie chart, daily and weekly reports with date pickers, and a burnout warning banner when signals are detected in your data.
 
-<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="70%" />
+<img src="screenshots/dashboard.png" alt="Dashboard with stats, burnout warning and daily report" width="50%" />
 
 ---
 
