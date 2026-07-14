@@ -9,7 +9,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <main className="md:ml-[260px] min-h-screen p-4 pt-[72px] md:pt-8 md:p-8 pb-24">
+      <main className="md:ml-[260px] min-h-screen p-4 pt-[72px] md:pt-8 md:px-8 md:pb-28 pb-28">
         {children}
       </main>
       <ActiveSessionBanner />

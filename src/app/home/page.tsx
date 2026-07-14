@@ -39,7 +39,7 @@ export default async function HomePage() {
   ]);
 
   const allSessions = (sessions ?? []) as Session[];
-  const todaySessions = allSessions.filter((s) => isToday(s.start_time) && s.end_time);
+  const todaySessions = allSessions.filter((s) => isToday(s.start_time));
   const hasSessionsToday = todaySessions.length > 0;
   const goalProgress = getGoalProgress(goals ?? [], allSessions);
 
@@ -48,7 +48,7 @@ export default async function HomePage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
-  const totalMinutesToday = todaySessions.reduce((sum, s) => sum + (s.net_study_minutes ?? 0), 0);
+  const totalMinutesToday = todaySessions.filter((s) => s.end_time).reduce((sum, s) => sum + (s.net_study_minutes ?? 0), 0);
   const uniqueLocationsToday = new Set(todaySessions.map((s) => s.location_name)).size;
 
   // Streak calculation
@@ -169,19 +169,33 @@ export default async function HomePage() {
                   {todaySessions.map((session) => (
                     <div key={session.id} className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-50">
-                          <MapPin size={13} className="text-pink-400" />
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${session.end_time ? "bg-pink-50" : "bg-green-50"}`}>
+                          <MapPin size={13} className={session.end_time ? "text-pink-400" : "text-green-400"} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-slate-800">{session.location_name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-slate-800">{session.location_name}</p>
+                            {!session.end_time && (
+                              <span className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-600">
+                                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
+                                In progress
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-slate-400">
-                            <LocalTime iso={session.start_time} /> – <LocalTime iso={session.end_time} />
+                            <LocalTime iso={session.start_time} />{session.end_time ? <> – <LocalTime iso={session.end_time} /></> : " – now"}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-pink-500">{formatMinutes(session.net_study_minutes ?? 0)}</p>
-                        <p className="text-xs text-slate-400">{formatMinutes(session.total_minutes ?? 0)} total</p>
+                        {session.end_time ? (
+                          <>
+                            <p className="text-sm font-semibold text-pink-500">{formatMinutes(session.net_study_minutes ?? 0)}</p>
+                            <p className="text-xs text-slate-400">{formatMinutes(session.total_minutes ?? 0)} total</p>
+                          </>
+                        ) : (
+                          <p className="text-xs text-slate-400">Active</p>
+                        )}
                       </div>
                     </div>
                   ))}
