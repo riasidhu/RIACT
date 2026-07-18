@@ -18,7 +18,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 ## What It Does
 
-**Session Tracking** is the foundation. Users start a session at any location — a library, a café, home — and RIACT runs a live timer. Breaks can be recorded mid-session, and when the session ends the user sees a full breakdown: start time, end time, every break, net study time versus total time at that location. Everything is editable before saving, and nothing gets locked in without the user's sign-off. An active session banner persists across every page so you can always see your live timer and return to it no matter where you navigate.
+**Session Tracking** is the foundation. Users start a session at any location — a library, a café, home — and RIACT runs a live timer. Breaks can be recorded mid-session, and when the session ends the user sees a full breakdown: start time, end time, every break, net study time versus total time at that location. Everything is editable before saving, and nothing gets locked in without the user's sign-off. If a session is ended too early by mistake, a Resume button on the review screen puts the timer straight back into active mode. Sessions can also be discarded entirely if they don't need to be logged. An active session banner persists across every page so you can always see your live timer and return to it no matter where you navigate.
 
 <img src="screenshots/home.png" alt="Home page with active session banner" width="70%" />
 
