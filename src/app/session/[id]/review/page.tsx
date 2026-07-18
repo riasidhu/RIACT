@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase";
 import { formatMinutes, toDatetimeLocal } from "@/lib/utils";
 import type { Break, Session } from "@/lib/types";
 import { differenceInMinutes, parseISO } from "date-fns";
-import { CheckCircle, Clock, Coffee, MapPin, Save } from "lucide-react";
+import { CheckCircle, Clock, Coffee, MapPin, Save, Trash2 } from "lucide-react";
 
 export default function ReviewSessionPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +54,12 @@ export default function ReviewSessionPage() {
       return sum;
     }, 0);
     return { net: Math.max(0, total - breakMins), total };
+  }
+
+  async function handleDiscard() {
+    if (!window.confirm("Discard this session? It will be permanently deleted.")) return;
+    await supabase.from("sessions").delete().eq("id", id);
+    router.push("/home");
   }
 
   async function handleSave() {
@@ -235,14 +241,24 @@ export default function ReviewSessionPage() {
             )}
           </div>
 
-          <button
-            onClick={handleSave}
-            disabled={loading || saved}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 py-3 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all duration-150"
-          >
-            <Save size={14} />
-            {loading ? "Saving…" : "Save Session"}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleSave}
+              disabled={loading || saved}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 py-3 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all duration-150"
+            >
+              <Save size={14} />
+              {loading ? "Saving…" : "Save Session"}
+            </button>
+            <button
+              onClick={handleDiscard}
+              disabled={loading || saved}
+              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-500 hover:border-red-200 disabled:opacity-50 transition-all duration-150"
+            >
+              <Trash2 size={14} />
+              Discard
+            </button>
+          </div>
         </div>
       </div>
     </AppLayout>
