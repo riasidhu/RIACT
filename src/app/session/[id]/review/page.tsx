@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase";
 import { formatMinutes, toDatetimeLocal } from "@/lib/utils";
 import type { Break, Session } from "@/lib/types";
 import { differenceInMinutes, parseISO } from "date-fns";
-import { CheckCircle, Clock, Coffee, MapPin, Save, Trash2 } from "lucide-react";
+import { CheckCircle, Clock, Coffee, MapPin, Play, Save, Trash2 } from "lucide-react";
 
 export default function ReviewSessionPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +54,11 @@ export default function ReviewSessionPage() {
       return sum;
     }, 0);
     return { net: Math.max(0, total - breakMins), total };
+  }
+
+  async function handleResume() {
+    await supabase.from("sessions").update({ end_time: null }).eq("id", id);
+    router.push(`/session/${id}`);
   }
 
   async function handleDiscard() {
@@ -241,6 +246,14 @@ export default function ReviewSessionPage() {
             )}
           </div>
 
+          <button
+            onClick={handleResume}
+            disabled={loading || saved}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-medium text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 disabled:opacity-50 transition-all duration-150 mb-3"
+          >
+            <Play size={14} />
+            Resume Session
+          </button>
           <div className="flex gap-3">
             <button
               onClick={handleSave}
