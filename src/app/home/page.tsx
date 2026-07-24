@@ -7,18 +7,9 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { getGoalProgress } from "@/lib/goals";
 import { formatMinutes, isToday } from "@/lib/utils";
 import LocalTime from "@/components/LocalTime";
+import QuoteCard from "@/components/QuoteCard";
 import type { Session } from "@/lib/types";
 import { BookOpen, Clock, MapPin, Plus, TrendingUp, Flame, Brain, Target, Lightbulb } from "lucide-react";
-
-const quotes = [
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-  { text: "Focus is not about saying yes to what's important, it's about saying no to everything else.", author: "Anonymous" },
-  { text: "Small daily improvements lead to stunning results.", author: "Robin Sharma" },
-  { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
-  { text: "Study hard, for the well is deep and our brains are shallow.", author: "Richard Baxter" },
-  { text: "The more that you read, the more things you will know.", author: "Dr. Seuss" },
-  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-];
 
 const tips = [
   { icon: "🧠", title: "Location matters", body: "Studying in the same spot trains your brain to focus. RIACT tracks which locations work best for you." },
@@ -66,7 +57,6 @@ export default async function HomePage() {
     return count;
   })();
 
-  const todayQuote = quotes[new Date().getDay() % quotes.length];
   const totalSessions = allSessions.filter((s) => s.end_time).length;
 
   return (
@@ -226,11 +216,7 @@ export default async function HomePage() {
           {/* Right column */}
           <div className="space-y-4">
             {/* Quote card */}
-            <div className="rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 p-5 shadow-lg shadow-pink-200">
-              <Brain size={18} className="text-pink-200 mb-3" />
-              <p className="text-sm font-medium text-white leading-relaxed italic">"{todayQuote.text}"</p>
-              <p className="text-xs text-pink-200 mt-3">— {todayQuote.author}</p>
-            </div>
+            <QuoteCard />
 
             {/* Quick links */}
             <div className="rounded-xl border border-slate-100 bg-white shadow-sm p-4">
