@@ -12,10 +12,10 @@ import type { Session } from "@/lib/types";
 import { BookOpen, Clock, MapPin, Plus, TrendingUp, Flame, Brain, Target, Lightbulb } from "lucide-react";
 
 const tips = [
-  { icon: "🧠", title: "Location matters", body: "Studying in the same spot trains your brain to focus. RIACT tracks which locations work best for you." },
-  { icon: "⏱️", title: "Log your breaks", body: "Breaks aren't wasted time. Tracking them helps RIACT understand your true productivity patterns." },
-  { icon: "🎯", title: "Set a daily goal", body: "Students with goals study 40% more consistently. Head to Goals to set your first target." },
-  { icon: "📊", title: "3 sessions to insights", body: "After 3 logged sessions, RIACT's AI will start detecting your patterns and giving recommendations." },
+  { icon: MapPin, title: "Location matters", body: "Studying in the same spot trains your brain to focus. RIACT tracks which locations work best for you." },
+  { icon: Clock, title: "Log your breaks", body: "Breaks aren't wasted time. Tracking them helps RIACT understand your true productivity patterns." },
+  { icon: Target, title: "Set a daily goal", body: "Students with goals study 40% more consistently. Head to Goals to set your first target." },
+  { icon: TrendingUp, title: "3 sessions to insights", body: "After 3 logged sessions, RIACT's AI will start detecting your patterns and giving recommendations." },
 ];
 
 export default async function HomePage() {
@@ -201,13 +201,16 @@ export default async function HomePage() {
                   <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">How RIACT Works</h2>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {tips.map((tip, i) => (
-                    <div key={i} className="rounded-lg bg-slate-50 p-4">
-                      <p className="text-lg mb-1">{tip.icon}</p>
-                      <p className="text-sm font-semibold text-slate-800 mb-1">{tip.title}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed">{tip.body}</p>
-                    </div>
-                  ))}
+                  {tips.map((tip, i) => {
+                    const Icon = tip.icon;
+                    return (
+                      <div key={i} className="rounded-lg bg-slate-50 p-4">
+                        <Icon size={18} className="text-pink-500 mb-2" />
+                        <p className="text-sm font-semibold text-slate-800 mb-1">{tip.title}</p>
+                        <p className="text-xs text-slate-500 leading-relaxed">{tip.body}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
