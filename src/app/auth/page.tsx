@@ -9,6 +9,7 @@ import RiactLogo from "@/components/RiactLogo";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -37,7 +38,11 @@ export default function AuthPage() {
     setLoading(true);
 
     if (isSignUp) {
-      const { data, error: authError } = await supabase.auth.signUp({ email, password });
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name.trim() } },
+      });
       setLoading(false);
       if (authError) { setError(authError.message); return; }
       // Supabase returns an empty identities array when email is already registered
@@ -185,6 +190,20 @@ export default function AuthPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div>
+                    <label className="mb-1.5 block text-sm text-slate-500">Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300 transition-colors"
+                      placeholder="Your name"
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="mb-1.5 block text-sm text-slate-500">Email</label>
                   <input

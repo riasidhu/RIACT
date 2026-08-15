@@ -13,6 +13,7 @@ import {
   BookOpen,
   Brain,
   CalendarDays,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/schedule", label: "Class Schedule", icon: CalendarDays },
   { href: "/locations", label: "Locations", icon: MapPin },
   { href: "/resources", label: "Resources & FAQ", icon: BookOpen },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 const GRADIENT = "linear-gradient(160deg, #ff6eb4 0%, #ec4899 40%, #c026d3 100%)";
@@ -62,11 +64,14 @@ export default function Sidebar() {
   const router = useRouter();
   const supabase = createClient();
   const [userEmail, setUserEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) setUserEmail(session.user.email);
+      const name = session?.user?.user_metadata?.full_name as string | undefined;
+      if (name) setFullName(name);
     });
   }, [supabase]);
 
@@ -79,7 +84,7 @@ export default function Sidebar() {
     router.refresh();
   }
 
-  const firstName = userEmail ? userEmail.split("@")[0] : "…";
+  const displayName = fullName || (userEmail ? userEmail.split("@")[0] : "…");
 
   const userSection = (
     <>
@@ -87,10 +92,10 @@ export default function Sidebar() {
       <div className="p-4">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/25">
-            <span className="text-xs font-bold text-white uppercase">{firstName.charAt(0)}</span>
+            <span className="text-xs font-bold text-white uppercase">{displayName.charAt(0)}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate capitalize">{firstName}</p>
+            <p className="text-sm font-semibold text-white truncate capitalize">{displayName}</p>
             <p className="text-xs text-pink-100/80 truncate">{userEmail}</p>
           </div>
         </div>

@@ -34,7 +34,8 @@ export default async function HomePage() {
   const hasSessionsToday = todaySessions.length > 0;
   const goalProgress = getGoalProgress(goals ?? [], allSessions);
 
-  const firstName = user?.email?.split("@")[0] ?? "there";
+  const fullName = (user?.user_metadata?.full_name as string | undefined)?.trim();
+  const firstName = fullName ? fullName.split(" ")[0] : user?.email?.split("@")[0] ?? "there";
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
