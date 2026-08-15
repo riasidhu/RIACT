@@ -8,6 +8,7 @@ import { getGoalProgress } from "@/lib/goals";
 import { formatMinutes, isToday } from "@/lib/utils";
 import LocalTime from "@/components/LocalTime";
 import QuoteCard from "@/components/QuoteCard";
+import NamePrompt from "@/components/NamePrompt";
 import type { Session } from "@/lib/types";
 import { BookOpen, Clock, MapPin, Plus, TrendingUp, Flame, Brain, Target, Lightbulb } from "lucide-react";
 
@@ -82,6 +83,9 @@ export default async function HomePage() {
             </button>
           </Link>
         </div>
+
+        {/* One-time name prompt for accounts without a name */}
+        {!fullName && <NamePrompt />}
 
         {/* Stats row — always visible */}
         <div className="grid grid-cols-4 gap-4 mb-8">
