@@ -6,7 +6,25 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppLayout from "@/components/AppLayout";
 import { createClient } from "@/lib/supabase";
-import { User, Mail, Settings as SettingsIcon } from "lucide-react";
+import { User, Mail, Clock, Settings as SettingsIcon } from "lucide-react";
+
+// Full IANA zone list when the runtime supports it, else a small common set.
+const TIME_ZONES: string[] =
+  typeof Intl.supportedValuesOf === "function"
+    ? Intl.supportedValuesOf("timeZone")
+    : [
+        "America/Los_Angeles",
+        "America/Denver",
+        "America/Chicago",
+        "America/New_York",
+        "America/Toronto",
+        "Europe/London",
+        "Europe/Paris",
+        "Asia/Kolkata",
+        "Asia/Singapore",
+        "Asia/Tokyo",
+        "Australia/Sydney",
+      ];
 
 export default function SettingsPage() {
   const supabase = createClient();
@@ -17,12 +35,18 @@ export default function SettingsPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [timezone, setTimezone] = useState(""); // "" = auto (device timezone)
 
   const [savingName, setSavingName] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
+  const [savingTz, setSavingTz] = useState(false);
 
   const [nameMsg, setNameMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [emailMsg, setEmailMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [tzMsg, setTzMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  const deviceTz =
+    typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "";
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -33,6 +57,7 @@ export default function SettingsPage() {
       setCurrentEmail(user.email ?? "");
       setEmail(user.email ?? "");
       setName((user.user_metadata?.full_name as string | undefined) ?? "");
+      setTimezone((user.user_metadata?.timezone as string | undefined) ?? "");
       setLoading(false);
     });
   }, [supabase, router]);
@@ -70,6 +95,20 @@ export default function SettingsPage() {
       type: "ok",
       text: `Confirmation sent to ${trimmed}. Click the link in that email to finish the change.`,
     });
+  }
+
+  async function handleSaveTimezone(e: React.FormEvent) {
+    e.preventDefault();
+    setTzMsg(null);
+    setSavingTz(true);
+    const { error } = await supabase.auth.updateUser({ data: { timezone } });
+    setSavingTz(false);
+    if (error) {
+      setTzMsg({ type: "err", text: error.message });
+      return;
+    }
+    setTzMsg({ type: "ok", text: "Timezone updated." });
+    router.refresh();
   }
 
   return (
@@ -149,6 +188,46 @@ export default function SettingsPage() {
                   className="rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all duration-150"
                 >
                   {savingEmail ? "Saving…" : "Update email"}
+                </button>
+              </form>
+            </section>
+
+            {/* Timezone */}
+            <section className="rounded-xl bg-white border border-slate-100 shadow-sm p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Clock size={16} className="text-pink-500" />
+                <h2 className="text-lg font-semibold text-slate-900">Timezone</h2>
+              </div>
+              <form onSubmit={handleSaveTimezone} className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-sm text-slate-500">Timezone</label>
+                  <select
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-slate-900 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300 transition-colors"
+                  >
+                    <option value="">Auto — use my device{deviceTz ? ` (${deviceTz})` : ""}</option>
+                    {TIME_ZONES.map((tz) => (
+                      <option key={tz} value={tz}>
+                        {tz.replace(/_/g, " ")}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    Used for your greeting and time-of-day messages. &ldquo;Auto&rdquo; follows whatever device you&rsquo;re on.
+                  </p>
+                </div>
+                {tzMsg && (
+                  <p className={`text-sm ${tzMsg.type === "ok" ? "text-green-600" : "text-red-600"}`}>
+                    {tzMsg.text}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={savingTz}
+                  className="rounded-xl bg-gradient-to-r from-pink-500 to-pink-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 hover:from-pink-400 hover:to-pink-500 disabled:opacity-50 transition-all duration-150"
+                >
+                  {savingTz ? "Saving…" : "Save timezone"}
                 </button>
               </form>
             </section>

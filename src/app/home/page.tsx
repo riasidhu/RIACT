@@ -5,10 +5,11 @@ import AppLayout from "@/components/AppLayout";
 import GoalProgressBars from "@/components/GoalProgressBar";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getGoalProgress } from "@/lib/goals";
-import { formatMinutes, isToday } from "@/lib/utils";
+import { formatMinutes, isToday, greetingForHour, hourInTimeZone } from "@/lib/utils";
 import LocalTime from "@/components/LocalTime";
 import QuoteCard from "@/components/QuoteCard";
 import NamePrompt from "@/components/NamePrompt";
+import Greeting from "@/components/Greeting";
 import type { Session } from "@/lib/types";
 import { BookOpen, Clock, MapPin, Plus, TrendingUp, Flame, Brain, Target, Lightbulb } from "lucide-react";
 
@@ -38,8 +39,8 @@ export default async function HomePage() {
   const fullName = (user?.user_metadata?.full_name as string | undefined)?.trim();
   const firstName = fullName ? fullName.split(" ")[0] : user?.email?.split("@")[0] ?? "there";
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+  const timezone = (user?.user_metadata?.timezone as string | undefined) || undefined;
+  const initialGreeting = greetingForHour(hourInTimeZone(timezone));
 
   const totalMinutesToday = todaySessions.filter((s) => s.end_time).reduce((sum, s) => sum + (s.net_study_minutes ?? 0), 0);
   const uniqueLocationsToday = new Set(todaySessions.map((s) => s.location_name)).size;
@@ -68,7 +69,7 @@ export default async function HomePage() {
         <div className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">
-              {greeting}, {displayName}
+              <Greeting name={displayName} timezone={timezone} initial={initialGreeting} />
             </h1>
             <p className="mt-1 text-slate-500 text-sm">
               {hasSessionsToday
