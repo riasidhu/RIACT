@@ -1,8 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // Middleware intentionally kept minimal.
 // Auth is enforced client-side in each page and server-side via Supabase RLS.
-export function middleware(request: NextRequest) {
+export function middleware() {
   return NextResponse.next();
 }
 

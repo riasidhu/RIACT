@@ -76,6 +76,8 @@ export default function Sidebar() {
   }, [supabase]);
 
   // Close drawer on route change
+  // Closes the mobile drawer on navigation — synchronising UI with the router.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   async function handleLogout() {

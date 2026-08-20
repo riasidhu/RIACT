@@ -18,6 +18,8 @@ export default function NamePrompt() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Deliberate: localStorage is browser-only, so this cannot run during SSR.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (localStorage.getItem(DISMISS_KEY) !== "1") setVisible(true);
   }, []);
 

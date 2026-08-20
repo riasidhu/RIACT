@@ -19,6 +19,8 @@ export default function Greeting({
   const [greeting, setGreeting] = useState(initial);
 
   useEffect(() => {
+    // Deliberate: corrects the server-rendered hour using the browser timezone. Must run after mount or hydration mismatches.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGreeting(greetingForHour(hourInTimeZone(timezone)));
   }, [timezone]);
 

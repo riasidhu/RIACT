@@ -44,8 +44,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      await supabase.auth.getUser();
 
       const [{ data: sess }, { data: brks }, { data: gols }] = await Promise.all([
         supabase.from("sessions").select("*").not("end_time", "is", null),
@@ -89,10 +88,10 @@ export default function DashboardPage() {
 
   const burnout = checkBurnout(sessions, breaks, goals);
 
-  const weekBreakCount = useMemo(() => {
-    const ids = new Set(weekSessions.map((s) => s.id));
-    return breaks.filter((b) => ids.has(b.session_id)).length;
-  }, [weekSessions, breaks]);
+  // weekSessions is rebuilt on every render, so a manual useMemo here never hit
+  // its cache and blocked the React Compiler from optimising the component.
+  const weekSessionIds = new Set(weekSessions.map((s) => s.id));
+  const weekBreakCount = breaks.filter((b) => weekSessionIds.has(b.session_id)).length;
 
   async function loadWeeklyRecommendations() {
     setLoadingRecs(true);
@@ -148,6 +147,8 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
+    // State is set after an await inside this call, not synchronously — the rule cannot see through the async boundary.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadWeeklyRecommendations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -387,7 +388,7 @@ export default function DashboardPage() {
             )}
 
             {!loadingPlan && !weeklyPlan && (
-              <p className="text-sm text-slate-400">Click "Generate AI Plan" to get a personalised Mon–Sun study schedule based on your habits.</p>
+              <p className="text-sm text-slate-400">Click &ldquo;Generate AI Plan&rdquo; to get a personalised Mon–Sun study schedule based on your habits.</p>
             )}
           </div>
         </div>

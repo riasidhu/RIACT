@@ -92,9 +92,7 @@ const FAQ = [
 
 export default async function ResourcesPage() {
   const supabase = await createServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  await supabase.auth.getUser();
 
   return (
     <AppLayout>

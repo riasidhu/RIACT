@@ -59,13 +59,15 @@ export default function QuoteCard() {
   const [quote, setQuote] = useState(quotes[0]);
 
   useEffect(() => {
+    // Deliberate: advances the localStorage-backed quote cycle after mount to keep the first render stable.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuote(quotes[nextQuoteIndex()]);
   }, []);
 
   return (
     <div className="rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 p-5 shadow-lg shadow-pink-200">
       <Brain size={18} className="text-pink-200 mb-3" />
-      <p className="text-sm font-medium text-white leading-relaxed italic">"{quote.text}"</p>
+      <p className="text-sm font-medium text-white leading-relaxed italic">&ldquo;{quote.text}&rdquo;</p>
       <p className="text-xs text-pink-200 mt-3">— {quote.author}</p>
     </div>
   );

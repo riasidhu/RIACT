@@ -22,8 +22,7 @@ export default function ReviewSessionPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      await supabase.auth.getUser();
 
       const { data: sess } = await supabase.from("sessions").select("*").eq("id", id).single();
       const { data: brks } = await supabase

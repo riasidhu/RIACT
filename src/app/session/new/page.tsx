@@ -12,11 +12,12 @@ export default function NewSessionPage() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [newLocation, setNewLocation] = useState("");
-  const [startTime, setStartTime] = useState(toDatetimeLocal());
-  const [projectedEnd, setProjectedEnd] = useState(
+  // Lazy initialiser: reading the clock during render is impure and would
+  // re-evaluate on every re-render. This runs once, on mount.
+  const [projectedEnd, setProjectedEnd] = useState(() =>
     toDatetimeLocal(new Date(Date.now() + 2 * 60 * 60 * 1000))
   );
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -24,8 +25,7 @@ export default function NewSessionPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      await supabase.auth.getUser();
 
       const { data } = await supabase.from("locations").select("*").order("name");
       if (data) setLocations(data);

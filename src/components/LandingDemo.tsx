@@ -25,6 +25,8 @@ const LABELS: Record<Screen, string> = {
 function useCountUp(running: boolean) {
   const [secs, setSecs] = useState(5460); // start at 1h 31m
   useEffect(() => {
+    // Resets the decorative landing-page timer when paused; no data depends on it.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!running) { setSecs(5460); return; }
     const id = setInterval(() => setSecs((s) => s + 1), 1000);
     return () => clearInterval(id);

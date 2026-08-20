@@ -19,8 +19,7 @@ export default function GoalsPage() {
   const [loading, setLoading] = useState(false);
 
   async function loadData() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    await supabase.auth.getUser();
 
     const [{ data: gols }, { data: sess }] = await Promise.all([
       supabase.from("goals").select("*").order("created_at", { ascending: false }),
@@ -31,6 +30,8 @@ export default function GoalsPage() {
   }
 
   useEffect(() => {
+    // State is set after an await inside loadData(), not synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

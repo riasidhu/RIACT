@@ -15,14 +15,15 @@ export default function LocationsPage() {
   const [editName, setEditName] = useState("");
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    await supabase.auth.getUser();
 
     const { data } = await supabase.from("locations").select("*").order("name");
     setLocations(data ?? []);
   }
 
   useEffect(() => {
+    // State is set after an await inside load(), not synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -174,7 +175,7 @@ export default function LocationsPage() {
         <div className="mt-6 rounded-xl bg-pink-50 border border-pink-100 p-4 flex gap-3">
           <MapPin size={15} className="text-pink-400 shrink-0 mt-0.5" />
           <p className="text-xs text-pink-700 leading-relaxed">
-            <span className="font-semibold">Tip:</span> Saved locations will appear as suggestions when you start a new study session, so you don't have to type them every time.
+            <span className="font-semibold">Tip:</span> Saved locations will appear as suggestions when you start a new study session, so you don&rsquo;t have to type them every time.
           </p>
         </div>
       </div>

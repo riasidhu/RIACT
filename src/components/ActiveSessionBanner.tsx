@@ -85,6 +85,8 @@ export default function ActiveSessionBanner() {
   }
 
   useEffect(() => {
+    // State is set after an await inside fetchActive(), not synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchActive();
     // Re-check every 30s in case the session was ended elsewhere
     const poll = setInterval(fetchActive, 30_000);

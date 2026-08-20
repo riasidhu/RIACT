@@ -158,7 +158,7 @@ export default async function HomePage() {
                 <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <TrendingUp size={15} className="text-pink-500" />
-                    <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Today's Sessions</h2>
+                    <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Today&rsquo;s Sessions</h2>
                   </div>
                 </div>
                 <div className="divide-y divide-slate-50">

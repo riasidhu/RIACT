@@ -142,6 +142,8 @@ export default function SchedulePage() {
   }
 
   useEffect(() => {
+    // State is set after an await inside loadData(), not synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -324,7 +326,7 @@ export default function SchedulePage() {
             <div className="p-12 text-center">
               <CalendarDays size={28} className="text-slate-200 mx-auto mb-3" />
               <p className="text-sm font-medium text-slate-600 mb-1">No classes added yet</p>
-              <p className="text-xs text-slate-400">Click "Add class" to fill in your timetable.</p>
+              <p className="text-xs text-slate-400">Click &ldquo;Add class&rdquo; to fill in your timetable.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
