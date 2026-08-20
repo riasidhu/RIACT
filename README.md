@@ -82,27 +82,47 @@ The AI recommends. The rules engine warns. The student decides.
 
 ## Running Locally
 
-Clone the repo and install dependencies:
+**Prerequisites:** Node.js 20.9 or later, a free [Supabase](https://supabase.com) project, and an [OpenAI API key](https://platform.openai.com/api-keys) with credits.
+
+**1. Clone and install**
 
 ```bash
+git clone https://github.com/riasidhu/RIACT.git
+cd RIACT
 npm install
 ```
 
-Create a `.env.local` file in the project root with the following:
+**2. Set up the database**
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-OPENAI_API_KEY=your_openai_key
+Create a new Supabase project, then open the **SQL Editor** and run [`supabase/schema.sql`](supabase/schema.sql). This creates the six tables RIACT uses — `locations`, `sessions`, `breaks`, `goals`, `schedule`, `schedule_exceptions` — and enables row-level security on all of them, so every user can only read and write their own rows.
+
+Under **Authentication → Providers**, make sure Email is enabled. Under **Authentication → URL Configuration**, add `http://localhost:3000/auth` as a redirect URL so password resets work locally.
+
+**3. Add your environment variables**
+
+```bash
+cp .env.example .env.local
 ```
 
-Then start the development server:
+Then fill in the three values:
+
+| Variable | Where to find it |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → `anon` `public` key |
+| `OPENAI_API_KEY` | platform.openai.com → API keys |
+
+`.env.local` is gitignored. Only the two `NEXT_PUBLIC_` values are exposed to the browser — the OpenAI key is read exclusively inside API routes and never reaches the client.
+
+**4. Start the dev server**
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), sign up with an email and password, and log your first session.
+
+The AI features — Insights, Weekly Plan and Coach — need at least three completed sessions before they have enough history to analyse. Everything else works from the first session.
 
 ---
 
