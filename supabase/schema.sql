@@ -1,14 +1,15 @@
 -- RIACT database schema
 -- Run this once in the Supabase SQL Editor on a new project.
 --
--- This mirrors the production database column-for-column: types, defaults and
--- nullability all match. User profile fields (name, timezone) live in
--- auth.users.user_metadata, so there is no profiles table.
+-- This mirrors the production database: columns, types, defaults, nullability,
+-- foreign keys and row-level security policies all match. User profile fields
+-- (name, timezone) live in auth.users.user_metadata, so there is no profiles
+-- table.
 
 -- ---------------------------------------------------------------- locations
 create table if not exists public.locations (
   id         uuid primary key default gen_random_uuid(),
-  user_id    uuid references auth.users (id) on delete cascade,
+  user_id    uuid,
   name       text not null,
   created_at timestamptz default now()
 );
@@ -16,7 +17,7 @@ create table if not exists public.locations (
 -- ----------------------------------------------------------------- sessions
 create table if not exists public.sessions (
   id                 uuid primary key default gen_random_uuid(),
-  user_id            uuid references auth.users (id) on delete cascade,
+  user_id            uuid,
   location_id        uuid references public.locations (id) on delete set null,
   location_name      text,
   start_time         timestamptz not null,
@@ -42,7 +43,7 @@ create table if not exists public.breaks (
 -- -------------------------------------------------------------------- goals
 create table if not exists public.goals (
   id            uuid primary key default gen_random_uuid(),
-  user_id       uuid references auth.users (id) on delete cascade,
+  user_id       uuid,
   location_name text,                    -- null = goal applies to all locations
   target_hours  numeric not null,
   timeframe     text,                    -- 'daily' | 'weekly'
@@ -53,7 +54,7 @@ create table if not exists public.goals (
 -- ----------------------------------------------------------------- schedule
 create table if not exists public.schedule (
   id          uuid primary key default gen_random_uuid(),
-  user_id     uuid references auth.users (id) on delete cascade,
+  user_id     uuid,
   course_name text not null,
   day_of_week text not null,             -- 'Monday' … 'Sunday'
   start_time  time not null,
@@ -80,42 +81,43 @@ alter table public.goals               enable row level security;
 alter table public.schedule            enable row level security;
 alter table public.schedule_exceptions enable row level security;
 
--- Tables owned directly by a user. The with-check clause also makes the
--- nullable user_id above safe: auth.uid() = null never evaluates true, so a
--- row without an owner cannot be inserted.
-create policy "own locations" on public.locations
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- Each policy omits WITH CHECK, so Postgres reuses the USING expression to
+-- validate inserts and updates as well. That is also what keeps the nullable
+-- user_id columns safe: auth.uid() = null evaluates to null rather than true,
+-- so a row with no owner cannot be written.
+create policy "Users can manage their own locations" on public.locations
+  for all using (auth.uid() = user_id);
 
-create policy "own sessions" on public.sessions
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "Users can manage their own sessions" on public.sessions
+  for all using (auth.uid() = user_id);
 
-create policy "own goals" on public.goals
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "Users can manage their own goals" on public.goals
+  for all using (auth.uid() = user_id);
 
-create policy "own schedule" on public.schedule
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "Users can manage own schedule" on public.schedule
+  for all using (auth.uid() = user_id);
 
--- Child tables inherit ownership through their parent row.
-create policy "own breaks" on public.breaks
+-- Child tables inherit ownership through their parent row. A missing parent
+-- makes the subquery null, so the comparison is null and access is denied.
+create policy "Users can manage their own breaks" on public.breaks
   for all using (
-    exists (select 1 from public.sessions s
-             where s.id = breaks.session_id and s.user_id = auth.uid())
-  ) with check (
-    exists (select 1 from public.sessions s
-             where s.id = breaks.session_id and s.user_id = auth.uid())
+    auth.uid() = (
+      select sessions.user_id from public.sessions
+       where sessions.id = breaks.session_id
+    )
   );
 
-create policy "own schedule exceptions" on public.schedule_exceptions
+create policy "Users can manage own exceptions" on public.schedule_exceptions
   for all using (
-    exists (select 1 from public.schedule c
-             where c.id = schedule_exceptions.schedule_id and c.user_id = auth.uid())
-  ) with check (
-    exists (select 1 from public.schedule c
-             where c.id = schedule_exceptions.schedule_id and c.user_id = auth.uid())
+    auth.uid() = (
+      select schedule.user_id from public.schedule
+       where schedule.id = schedule_exceptions.schedule_id
+    )
   );
 
 -- ---------------------------------------------------------------- indexes
--- Performance only — the app is correct without these.
+-- Not present in the production database — added here for query performance
+-- only. Safe to drop; the app is correct without them.
 create index if not exists sessions_user_start_idx
   on public.sessions (user_id, start_time desc);
 
