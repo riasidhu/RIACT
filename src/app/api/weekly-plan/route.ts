@@ -3,7 +3,12 @@ import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 import { subDays } from "date-fns";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Constructed per request rather than at module scope: the OpenAI SDK throws
+// when the key is absent, and at module scope that turns a missing key into a
+// build failure instead of a request-time error.
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 function getUserIdFromJwt(token: string): string | null {
   try {
@@ -55,7 +60,7 @@ export async function POST(request: NextRequest) {
       })),
     };
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       max_tokens: 400,
       response_format: { type: "json_object" },
