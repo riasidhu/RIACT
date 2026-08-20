@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Test
+        run: npm test
+
       # No secrets needed: the OpenAI client is constructed per request, so a
       # missing key is a request-time error rather than a build failure.
       - name: Build

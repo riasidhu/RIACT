@@ -76,6 +76,11 @@ The most important design decision in RIACT was keeping burnout detection entire
 
 Every burnout warning is explicitly labelled as a signal detected in study data, not a diagnosis, and always surfaces a link to mental health resources rather than prescribing a course of action. The AI Coach is system-prompted to stay strictly within study habit advice and to redirect any mental health topics to professional support rather than engaging with them.
 
+That separation is covered by tests. `src/lib/burnout.test.ts` pins each rule's
+threshold — the 85% session-length drop, the 1.25x break-frequency increase, the
+late-night cutoff and the 50% goal-completion rate — along with the boundaries on
+either side of them, so the detection logic cannot drift silently.
+
 The AI recommends. The rules engine warns. The student decides.
 
 ---
@@ -121,6 +126,14 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000), sign up with an email and password, and log your first session.
+
+**Running the tests**
+
+```bash
+npm test
+```
+
+The suite covers the burnout detection rules — the deterministic core described under [Responsible AI Design](#responsible-ai-design). It needs no database or API key.
 
 The AI features — Insights, Weekly Plan and Coach — need at least three completed sessions before they have enough history to analyse. Everything else works from the first session.
 
