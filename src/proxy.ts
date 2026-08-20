@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
-// Middleware intentionally kept minimal.
+// Proxy intentionally kept minimal (renamed from the deprecated `middleware`
+// file convention in Next.js 16).
 // Auth is enforced client-side in each page and server-side via Supabase RLS.
-export function middleware() {
+export function proxy() {
   return NextResponse.next();
 }
 
