@@ -5,7 +5,14 @@ import AppLayout from "@/components/AppLayout";
 import GoalProgressBars from "@/components/GoalProgressBar";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getGoalProgress } from "@/lib/goals";
-import { formatMinutes, isToday, greetingForHour, hourInTimeZone } from "@/lib/utils";
+import {
+  formatMinutes,
+  isToday,
+  greetingForHour,
+  hourInTimeZone,
+  MIN_SESSIONS_FOR_AI,
+  countSessionsForAI,
+} from "@/lib/utils";
 import LocalTime from "@/components/LocalTime";
 import QuoteCard from "@/components/QuoteCard";
 import NamePrompt from "@/components/NamePrompt";
@@ -61,6 +68,11 @@ export default async function HomePage() {
   })();
 
   const totalSessions = allSessions.filter((s) => s.end_time).length;
+
+  // Counts only what /api/analyze actually looks at, so the indicator cannot
+  // claim "AI Active" for history the analysis will ignore.
+  const aiReadySessions = countSessionsForAI(allSessions);
+  const sessionsUntilAI = Math.max(0, MIN_SESSIONS_FOR_AI - aiReadySessions);
 
   return (
     <AppLayout>
@@ -253,21 +265,21 @@ export default async function HomePage() {
             <div className="rounded-xl border border-slate-100 bg-white shadow-sm p-4">
               <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">AI Status</h3>
               <div className="flex items-center gap-2 mb-2">
-                <div className={`h-2 w-2 rounded-full ${totalSessions >= 3 ? "bg-green-400" : "bg-amber-400"}`} />
+                <div className={`h-2 w-2 rounded-full ${sessionsUntilAI === 0 ? "bg-green-400" : "bg-amber-400"}`} />
                 <p className="text-sm font-medium text-slate-700">
-                  {totalSessions >= 3 ? "AI Active" : "Warming Up"}
+                  {sessionsUntilAI === 0 ? "AI Active" : "Warming Up"}
                 </p>
               </div>
               <p className="text-xs text-slate-400">
-                {totalSessions >= 3
+                {sessionsUntilAI === 0
                   ? "RIACT is analyzing your patterns."
-                  : `${3 - totalSessions} more session${3 - totalSessions === 1 ? "" : "s"} needed to activate AI insights.`}
+                  : `${sessionsUntilAI} more session${sessionsUntilAI === 1 ? "" : "s"} needed to activate AI insights.`}
               </p>
-              {totalSessions < 3 && (
+              {sessionsUntilAI > 0 && (
                 <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
                   <div
                     className="h-1.5 rounded-full bg-gradient-to-r from-pink-400 to-pink-500 transition-all"
-                    style={{ width: `${(totalSessions / 3) * 100}%` }}
+                    style={{ width: `${(aiReadySessions / MIN_SESSIONS_FOR_AI) * 100}%` }}
                   />
                 </div>
               )}

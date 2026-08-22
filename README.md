@@ -12,7 +12,7 @@
 
 Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9AM actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
 
-RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and uses AI to surface patterns and give coaching that's grounded in the user's own data rather than generic advice. Risk signals are detected separately, by a rules engine rather than a model.
+RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and after three completed sessions starts using AI to surface patterns and give coaching that's grounded in the user's own data rather than generic advice. Risk signals are detected separately, by a rules engine rather than a model.
 
 ---
 
@@ -30,7 +30,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 ---
 
-**AI Insights** run as soon as you have logged a session, though they need a few before the patterns mean much — the home page tracks progress towards three as a suggested minimum. The Insights page sends your session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that you consistently produce your best net study time on Tuesday mornings at the library, it says so specifically — not generically.
+**AI Insights** unlock after three completed sessions in the last 30 days — the same window the analysis reads, so the progress indicator on the home page and the Insights page can never disagree. The Insights page sends your session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that you consistently produce your best net study time on Tuesday mornings at the library, it says so specifically — not generically.
 
 **Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning when enough signals are present. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The student decides what it means.
 
@@ -143,7 +143,7 @@ npm test
 
 The suite covers the burnout detection rules — the deterministic core described under [Responsible AI Design](#responsible-ai-design). It needs no database or API key.
 
-The AI features work from your first logged session, but they have little to go on until you have a handful. The home page shows progress towards three sessions as a suggested starting point.
+AI Insights need three completed sessions within the last 30 days before they run; the home page shows progress towards that. The thresholds live in `MIN_SESSIONS_FOR_AI` and `AI_HISTORY_DAYS` in `src/lib/utils.ts`.
 
 ---
 

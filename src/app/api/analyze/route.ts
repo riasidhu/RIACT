@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 import { subDays } from "date-fns";
+import { AI_HISTORY_DAYS, MIN_SESSIONS_FOR_AI } from "@/lib/utils";
 import type { AnalysisResult } from "@/lib/types";
 
 // Constructed per request rather than at module scope: the OpenAI SDK throws
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
       auth: { persistSession: false },
     });
 
-    const since = subDays(new Date(), 30).toISOString();
+    const since = subDays(new Date(), AI_HISTORY_DAYS).toISOString();
 
     const { data: sessions } = await supabase
       .from("sessions")
@@ -72,7 +73,21 @@ export async function POST(request: NextRequest) {
       .gte("start_time", since)
       .not("end_time", "is", null);
 
-    const sessionIds = (sessions ?? []).map((s) => s.id);
+    // Gate before fetching breaks: below the minimum there is nothing to analyse.
+    const completed = sessions ?? [];
+    if (completed.length < MIN_SESSIONS_FOR_AI) {
+      const remaining = MIN_SESSIONS_FOR_AI - completed.length;
+      return NextResponse.json({
+        patterns: `Not enough session data yet. Log ${remaining} more completed session${remaining === 1 ? "" : "s"} to unlock AI insights.`,
+        recommendations: [
+          "Start logging sessions at your favorite study spots",
+          "Set a daily or weekly study goal to track progress",
+          "Try studying at different times to find your peak focus window",
+        ],
+      });
+    }
+
+    const sessionIds = completed.map((s) => s.id);
     let breaks: { session_id: string; start_time: string; end_time: string | null; duration_minutes: number | null }[] = [];
 
     if (sessionIds.length > 0) {
@@ -83,19 +98,8 @@ export async function POST(request: NextRequest) {
       breaks = brks ?? [];
     }
 
-    if (!sessions || sessions.length === 0) {
-      return NextResponse.json({
-        patterns: "Not enough session data yet. Log a few study sessions to unlock AI insights.",
-        recommendations: [
-          "Start logging sessions at your favorite study spots",
-          "Set a daily or weekly study goal to track progress",
-          "Try studying at different times to find your peak focus window",
-        ],
-      });
-    }
-
     const payload = {
-      sessions: sessions.map((s) => ({
+      sessions: completed.map((s) => ({
         location: s.location_name,
         start: s.start_time,
         end: s.end_time,

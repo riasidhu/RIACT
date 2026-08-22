@@ -78,6 +78,24 @@ export function getWeekRange(date: Date) {
   };
 }
 
+// AI features analyse a rolling window of recent sessions, and need a minimum
+// number of them before the output means anything. Both the /api/analyze gate
+// and the progress indicator on the home page read these, so the two agree.
+export const AI_HISTORY_DAYS = 30;
+export const MIN_SESSIONS_FOR_AI = 3;
+
+// Completed sessions inside the AI history window — the same set /api/analyze
+// reads, so a progress indicator built on this cannot promise analysis the
+// route will then refuse.
+export function countSessionsForAI(
+  sessions: { start_time: string; end_time: string | null }[]
+): number {
+  const cutoff = Date.now() - AI_HISTORY_DAYS * 24 * 60 * 60 * 1000;
+  return sessions.filter(
+    (s) => s.end_time && new Date(s.start_time).getTime() >= cutoff
+  ).length;
+}
+
 export const CHART_COLORS = ["#EC4899", "#F472B6", "#A855F7", "#6366F1", "#38BDF8", "#34D399"];
 
 // Hour (0–23) of a given instant in the given IANA time zone. Omit `tz` to use
