@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  # Application dependencies.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Routine bumps arrive as a single PR. Majors are deliberately excluded
+      # so each one gets reviewed on its own -- openai 7, eslint 10 and
+      # @types/node 26 are all pending and each needs a real look.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "chore"
+      include: scope
+
+  # Workflow actions. actions/checkout and actions/setup-node hit a Node 20
+  # deprecation that only surfaced as a warning annotation on a CI run.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
