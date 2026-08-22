@@ -11,6 +11,8 @@ function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
+const HISTORY_DAYS = 30;
+
 /** Decode a Supabase JWT and return the `sub` (user id) without a network call */
 function getUserIdFromJwt(token: string): string | null {
   try {
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
       auth: { persistSession: false },
     });
 
-    const since = subDays(new Date(), 30).toISOString();
+    const since = subDays(new Date(), HISTORY_DAYS).toISOString();
 
     const { data: sessions } = await supabase
       .from("sessions")
@@ -95,6 +97,10 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = {
+      // Stated explicitly so the model can calibrate its language to the sample
+      // size rather than describing a single session as an established pattern.
+      session_count: sessions.length,
+      window_days: HISTORY_DAYS,
       sessions: sessions.map((s) => ({
         location: s.location_name,
         start: s.start_time,
@@ -133,6 +139,7 @@ Rules:
 - Never recommend studying at 10pm or later, or maintaining a late-night routine, even where the data shows the student focuses best then. RIACT counts repeated late-night sessions as a fatigue signal, so endorsing them would contradict its own warnings. State the pattern honestly if it is real, then suggest reproducing those conditions earlier in the day.
 - Never suggest taking fewer or shorter breaks.
 - Address the student directly as "you", not as "the student".
+- Match your confidence to session_count. With fewer than 3 sessions there is no pattern to find: describe what those sessions actually looked like and say plainly that more are needed before trends mean anything. Never present one or two sessions as a habit, a peak focus window, or a best location.
 
 Data: ${JSON.stringify(payload)}`,
         },

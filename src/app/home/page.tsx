@@ -261,7 +261,7 @@ export default async function HomePage() {
               <p className="text-xs text-slate-400">
                 {totalSessions >= 3
                   ? "RIACT is analyzing your patterns."
-                  : `${3 - totalSessions} more session${3 - totalSessions === 1 ? "" : "s"} needed to activate AI insights.`}
+                  : `Insights run from your first session, but need ${3 - totalSessions} more before patterns are reliable.`}
               </p>
               {totalSessions < 3 && (
                 <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
