@@ -234,28 +234,25 @@ export default function InsightsPage() {
               <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Burnout Risk</h2>
             </div>
 
-            {analysis ? (
+            {/* Risk level comes from checkBurnout(), never from the model. The
+                signals behind it are listed in the banner at the top of the page. */}
+            {sessions.length > 0 ? (
               <div className="space-y-4">
                 {(() => {
-                  const cfg = riskConfig[analysis.burnout_risk] ?? riskConfig.low;
+                  const cfg = riskConfig[burnout.risk] ?? riskConfig.low;
                   return (
                     <div className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-semibold ${cfg.bg} ${cfg.text} ${cfg.border}`}>
-                      <div className={`h-1.5 w-1.5 rounded-full ${analysis.burnout_risk === "low" ? "bg-green-500" : analysis.burnout_risk === "medium" ? "bg-amber-500" : "bg-red-500"}`} />
+                      <div className={`h-1.5 w-1.5 rounded-full ${burnout.risk === "low" ? "bg-green-500" : burnout.risk === "medium" ? "bg-amber-500" : "bg-red-500"}`} />
                       {cfg.label}
                     </div>
                   );
                 })()}
 
-                {analysis.burnout_signals?.length > 0 && (
-                  <ul className="space-y-1.5">
-                    {analysis.burnout_signals.map((s, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-slate-600">
-                        <span className="text-slate-300 mt-0.5 shrink-0">•</span>
-                        <span>{s}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <p className="text-sm text-slate-500">
+                  {burnout.triggered
+                    ? `Based on ${burnout.signals.length} signal${burnout.signals.length === 1 ? "" : "s"} detected in your study data, listed above.`
+                    : "No burnout signals detected in your recent study data."}
+                </p>
 
                 <p className="rounded-lg bg-slate-50 border border-slate-100 p-3 text-xs text-slate-400 leading-relaxed">
                   RIACT detects burnout signals but does not provide medical diagnoses. If you feel overwhelmed, please reach out to campus counseling services.

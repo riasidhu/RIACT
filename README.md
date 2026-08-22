@@ -76,10 +76,18 @@ The most important design decision in RIACT was keeping burnout detection entire
 
 Every burnout warning is explicitly labelled as a signal detected in study data, not a diagnosis, and always surfaces a link to mental health resources rather than prescribing a course of action. The AI Coach is system-prompted to stay strictly within study habit advice and to redirect any mental health topics to professional support rather than engaging with them.
 
+The risk level shown on the Insights page comes from the same function. It is
+banded by how many of the four rules fired — none is Low, one or two is Medium,
+three or more is High — so the badge a student sees traces back to specific
+signals in their own data. The `/api/analyze` prompt asks the model only for
+study patterns and recommendations, and explicitly instructs it not to assess
+burnout, wellbeing or mental state.
+
 That separation is covered by tests. `src/lib/burnout.test.ts` pins each rule's
 threshold — the 85% session-length drop, the 1.25x break-frequency increase, the
 late-night cutoff and the 50% goal-completion rate — along with the boundaries on
-either side of them, so the detection logic cannot drift silently.
+either side of them, and the risk bands they roll up into, so the detection logic
+cannot drift silently.
 
 The AI recommends. The rules engine warns. The student decides.
 

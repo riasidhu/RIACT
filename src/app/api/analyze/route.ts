@@ -86,8 +86,6 @@ export async function POST(request: NextRequest) {
     if (!sessions || sessions.length === 0) {
       return NextResponse.json({
         patterns: "Not enough session data yet. Log a few study sessions to unlock AI insights.",
-        burnout_risk: "low" as const,
-        burnout_signals: [],
         recommendations: [
           "Start logging sessions at your favorite study spots",
           "Set a daily or weekly study goal to track progress",
@@ -115,8 +113,6 @@ export async function POST(request: NextRequest) {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({
         patterns: "OpenAI API key not configured. Add OPENAI_API_KEY to your environment.",
-        burnout_risk: "low" as const,
-        burnout_signals: [],
         recommendations: [
           "Configure OPENAI_API_KEY to enable AI-powered insights",
         ],
@@ -130,7 +126,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "user",
-          content: `You are a study coach. Analyze this student data and respond with ONLY a JSON object with these exact keys: "patterns" (1 sentence about best study time/location), "burnout_risk" ("low", "medium", or "high"), "burnout_signals" (array of strings, can be empty), "recommendations" (array of exactly 3 short tips).
+          content: `You are a study coach. Analyze this student data and respond with ONLY a JSON object with these exact keys: "patterns" (1 sentence about best study time/location), "recommendations" (array of exactly 3 short tips). Do not assess burnout, wellbeing or mental state -- that is handled separately by a deterministic rules engine.
 
 Data: ${JSON.stringify(payload)}`,
         },

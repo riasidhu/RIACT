@@ -8,8 +8,9 @@ const NOW = new Date(2026, 5, 15, 12, 0, 0);
 
 /**
  * Build an ISO timestamp N days before NOW at a given *local* hour.
- * lateNightSessions() compares against getHours(), which is local, so
- * constructing these with local setters keeps the suite timezone-independent.
+ * With no timezone passed, lateNightSessions() resolves hours in the runtime's
+ * zone, so building these with local setters keeps the suite
+ * timezone-independent. Tests that pin a specific zone use fixed UTC instants.
  */
 function isoAt(daysAgo: number, hour: number): string {
   const d = new Date(NOW);
@@ -86,7 +87,7 @@ afterEach(() => {
 describe("checkBurnout", () => {
   it("reports no signals when there is no data at all", () => {
     const result = checkBurnout([], [], []);
-    expect(result).toEqual({ triggered: false, signals: [] });
+    expect(result).toEqual({ triggered: false, risk: "low", signals: [] });
   });
 
   it("does not trigger on a healthy, steady week", () => {
@@ -326,6 +327,60 @@ describe("checkBurnout", () => {
     const first = checkBurnout(sessions, [], []);
     const second = checkBurnout(sessions, [], []);
     expect(second).toEqual(first);
+  });
+});
+
+describe("burnout risk level", () => {
+  // Banding is derived from how many of the four rules fired. It exists so the
+  // Insights page can show a Low/Medium/High badge without asking the model.
+  it("reports low risk when nothing fired", () => {
+    expect(checkBurnout([], [], []).risk).toBe("low");
+  });
+
+  it("reports medium risk on a single signal", () => {
+    // Three late-night sessions and nothing else.
+    const sessions = Array.from({ length: 3 }, (_, i) =>
+      session({ start_time: isoAt(i + 1, 22), end_time: isoAt(i + 1, 23) })
+    );
+    const result = checkBurnout(sessions, [], []);
+    expect(result.signals).toHaveLength(1);
+    expect(result.risk).toBe("medium");
+  });
+
+  it("reports medium risk on two signals", () => {
+    // Late nights plus a missed goal, but session length holds steady.
+    const sessions = Array.from({ length: 3 }, (_, i) =>
+      session({ start_time: isoAt(i + 1, 22), end_time: isoAt(i + 1, 23) })
+    );
+    const result = checkBurnout(sessions, [], [goal({ target_hours: 40 })]);
+    expect(result.signals).toHaveLength(2);
+    expect(result.risk).toBe("medium");
+  });
+
+  it("reports high risk once three signals fire", () => {
+    const sessions = [
+      session({ start_time: isoAt(9, 10), net_study_minutes: 200 }),
+      session({ start_time: isoAt(10, 10), net_study_minutes: 200 }),
+      session({ start_time: isoAt(1, 22), net_study_minutes: 20 }),
+      session({ start_time: isoAt(2, 22), net_study_minutes: 20 }),
+      session({ start_time: isoAt(3, 22), net_study_minutes: 20 }),
+    ];
+    const result = checkBurnout(sessions, [], [goal({ target_hours: 20 })]);
+    expect(result.signals.length).toBeGreaterThanOrEqual(3);
+    expect(result.risk).toBe("high");
+  });
+
+  it("keeps risk and triggered consistent", () => {
+    const quiet = checkBurnout([], [], []);
+    expect(quiet.triggered).toBe(false);
+    expect(quiet.risk).toBe("low");
+
+    const sessions = Array.from({ length: 3 }, (_, i) =>
+      session({ start_time: isoAt(i + 1, 22), end_time: isoAt(i + 1, 23) })
+    );
+    const noisy = checkBurnout(sessions, [], []);
+    expect(noisy.triggered).toBe(true);
+    expect(noisy.risk).not.toBe("low");
   });
 });
 

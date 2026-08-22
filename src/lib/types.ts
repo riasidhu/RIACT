@@ -36,15 +36,16 @@ export interface Goal {
   created_at: string;
 }
 
+// What the model is asked for. Deliberately excludes any burnout assessment:
+// that is computed by checkBurnout() in ./burnout.ts, with no model involved.
 export interface AnalysisResult {
   patterns: string;
-  burnout_risk: "low" | "medium" | "high";
-  burnout_signals: string[];
   recommendations: string[];
 }
 
 export interface BurnoutCheck {
   triggered: boolean;
+  risk: "low" | "medium" | "high";
   signals: string[];
 }
 

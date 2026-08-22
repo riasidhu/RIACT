@@ -51,6 +51,13 @@ function goalCompletionRate(
   return met / activeGoals.length;
 }
 
+// Risk band from the number of independent rules that fired. There are four
+// rules in total, so three firing at once is the top band.
+function riskFromSignalCount(count: number): BurnoutCheck["risk"] {
+  if (count === 0) return "low";
+  return count >= 3 ? "high" : "medium";
+}
+
 export function checkBurnout(
   sessions: Session[],
   breaks: Break[],
@@ -93,7 +100,11 @@ export function checkBurnout(
     signals.push("Goal completion rate below 50%");
   }
 
-  return { triggered: signals.length > 0, signals };
+  return {
+    triggered: signals.length > 0,
+    risk: riskFromSignalCount(signals.length),
+    signals,
+  };
 }
 
 export function sessionNetMinutes(session: Session, breaks: Break[]): number {
