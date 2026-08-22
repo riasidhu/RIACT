@@ -41,10 +41,13 @@ export default function DashboardPage() {
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [weeklyPlan, setWeeklyPlan] = useState<{ summary: string; days: WeeklyPlanDay[] } | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
+  // Saved IANA zone, if the user set one in Settings; undefined = device zone.
+  const [timezone, setTimezone] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function load() {
-      await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
+      setTimezone((user?.user_metadata?.timezone as string | undefined) || undefined);
 
       const [{ data: sess }, { data: brks }, { data: gols }] = await Promise.all([
         supabase.from("sessions").select("*").not("end_time", "is", null),
@@ -86,7 +89,7 @@ export default function DashboardPage() {
   const weekSessions = sessionsInRange(sessions, weekRange.start, weekRange.end);
   const weekAgg = aggregateByLocation(weekSessions);
 
-  const burnout = checkBurnout(sessions, breaks, goals);
+  const burnout = checkBurnout(sessions, breaks, goals, timezone);
 
   // weekSessions is rebuilt on every render, so a manual useMemo here never hit
   // its cache and blocked the React Compiler from optimising the component.

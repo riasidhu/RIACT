@@ -199,6 +199,36 @@ describe("checkBurnout", () => {
       expect(hasSignal(signals, LATE)).toBe(false);
     });
 
+    describe("when the user has saved a timezone", () => {
+      // Each instant is 22:00 in Tokyo (UTC+9) but 14:00 in London (BST).
+      // Same absolute moments — only the zone changes the verdict.
+      function fixedInstants(): Session[] {
+        return [
+          "2026-06-14T13:00:00.000Z",
+          "2026-06-13T13:00:00.000Z",
+          "2026-06-12T13:00:00.000Z",
+        ].map((iso) => session({ start_time: iso, end_time: iso }));
+      }
+
+      it("counts sessions that are late night in that zone", () => {
+        const { signals } = checkBurnout(fixedInstants(), [], [], "Asia/Tokyo");
+        expect(hasSignal(signals, LATE)).toBe(true);
+      });
+
+      it("does not count the same instants where they fall in the afternoon", () => {
+        const { signals } = checkBurnout(fixedInstants(), [], [], "Europe/London");
+        expect(hasSignal(signals, LATE)).toBe(false);
+      });
+
+      it("falls back to the runtime zone when no timezone is given", () => {
+        // Built with local setters, so this is 10pm wherever the test runs.
+        const local = Array.from({ length: 3 }, (_, i) =>
+          session({ start_time: isoAt(i + 1, 22), end_time: isoAt(i + 1, 23) })
+        );
+        expect(hasSignal(checkBurnout(local, [], []).signals, LATE)).toBe(true);
+      });
+    });
+
     it("does not count late sessions from the week before", () => {
       const sessions = Array.from({ length: 3 }, (_, i) =>
         session({ start_time: isoAt(i + 9, 22), end_time: isoAt(i + 9, 23) })

@@ -47,6 +47,8 @@ export default function InsightsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [breaks, setBreaks] = useState<Break[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  // Saved IANA zone, if the user set one in Settings; undefined = device zone.
+  const [timezone, setTimezone] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     async function load() {
@@ -59,7 +61,8 @@ export default function InsightsPage() {
         }
 
         const user = session.user;
-        
+        setTimezone((user.user_metadata?.timezone as string | undefined) || undefined);
+
 
         const [{ data: sess }, { data: brks }, { data: gols }] = await Promise.all([
           supabase.from("sessions").select("*"),
@@ -108,7 +111,7 @@ export default function InsightsPage() {
     load();
   }, [supabase]);
 
-  const burnout = checkBurnout(sessions, breaks, goals);
+  const burnout = checkBurnout(sessions, breaks, goals, timezone);
   const goalProgress = getGoalProgress(
     goals.filter((g) => g.is_active),
     sessions

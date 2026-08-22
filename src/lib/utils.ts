@@ -80,15 +80,20 @@ export function getWeekRange(date: Date) {
 
 export const CHART_COLORS = ["#EC4899", "#F472B6", "#A855F7", "#6366F1", "#38BDF8", "#34D399"];
 
-// Current hour (0–23) in the given IANA time zone. Omit `tz` to use the
-// runtime's local zone (the browser's device zone on the client).
-export function hourInTimeZone(tz?: string): number {
+// Hour (0–23) of a given instant in the given IANA time zone. Omit `tz` to use
+// the runtime's local zone (the browser's device zone on the client).
+export function hourOfDateInTimeZone(date: Date, tz?: string): number {
   const parts = new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     hourCycle: "h23",
     timeZone: tz || undefined,
-  }).format(new Date());
+  }).format(date);
   return parseInt(parts, 10) || 0;
+}
+
+// Current hour (0–23) in the given IANA time zone.
+export function hourInTimeZone(tz?: string): number {
+  return hourOfDateInTimeZone(new Date(), tz);
 }
 
 export function greetingForHour(hour: number): string {

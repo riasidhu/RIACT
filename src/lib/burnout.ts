@@ -1,6 +1,6 @@
 import { differenceInMinutes, parseISO, subDays } from "date-fns";
 import type { Break, BurnoutCheck, Goal, Session } from "./types";
-import { calculateBreakMinutes } from "./utils";
+import { calculateBreakMinutes, hourOfDateInTimeZone } from "./utils";
 
 function avgSessionLength(sessions: Session[]): number {
   const completed = sessions.filter((s) => s.end_time && s.net_study_minutes != null);
@@ -15,9 +15,11 @@ function avgBreaksPerSession(sessions: Session[], breaks: Break[]): number {
   return relevantBreaks.length / sessions.length;
 }
 
-function lateNightSessions(sessions: Session[]): number {
+// `timezone` is the user's saved IANA zone. Without one this falls back to the
+// runtime's zone, which on the client is the browser's device zone.
+function lateNightSessions(sessions: Session[], timezone?: string): number {
   return sessions.filter((s) => {
-    const hour = parseISO(s.start_time).getHours();
+    const hour = hourOfDateInTimeZone(parseISO(s.start_time), timezone);
     return hour >= 22;
   }).length;
 }
@@ -52,7 +54,8 @@ function goalCompletionRate(
 export function checkBurnout(
   sessions: Session[],
   breaks: Break[],
-  goals: Goal[]
+  goals: Goal[],
+  timezone?: string
 ): BurnoutCheck {
   const signals: string[] = [];
   const now = new Date();
@@ -81,7 +84,7 @@ export function checkBurnout(
     signals.push("Break frequency is increasing");
   }
 
-  if (lateNightSessions(last7) > 2) {
+  if (lateNightSessions(last7, timezone) > 2) {
     signals.push("More than 2 sessions after 10pm in the last 7 days");
   }
 
