@@ -126,7 +126,13 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "user",
-          content: `You are a study coach. Analyze this student data and respond with ONLY a JSON object with these exact keys: "patterns" (1 sentence about best study time/location), "recommendations" (array of exactly 3 short tips). Do not assess burnout, wellbeing or mental state -- that is handled separately by a deterministic rules engine.
+          content: `You are a study coach. Analyze this student data and respond with ONLY a JSON object with these exact keys: "patterns" (1 sentence about best study time/location), "recommendations" (array of exactly 3 short tips).
+
+Rules:
+- Do not assess burnout, wellbeing or mental state. A deterministic rules engine handles that separately.
+- Never recommend studying at 10pm or later, or maintaining a late-night routine, even where the data shows the student focuses best then. RIACT counts repeated late-night sessions as a fatigue signal, so endorsing them would contradict its own warnings. State the pattern honestly if it is real, then suggest reproducing those conditions earlier in the day.
+- Never suggest taking fewer or shorter breaks.
+- Address the student directly as "you", not as "the student".
 
 Data: ${JSON.stringify(payload)}`,
         },

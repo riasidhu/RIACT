@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
 }
 Use 0 hours for rest days. Base it on their patterns and work around their classes.
 
+Do not build the plan around late-night study or write focus tips encouraging it, even where their history shows late sessions: RIACT counts repeated sessions after 10pm as a fatigue signal. Do not assess burnout, wellbeing or mental state.
+
 Data: ${JSON.stringify(context)}`,
         },
       ],
