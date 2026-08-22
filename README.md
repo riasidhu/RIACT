@@ -12,7 +12,7 @@
 
 Most students study hard. Very few know whether they're studying smart. Without data, it's impossible to tell whether the library at 9AM actually produces better focus than your bedroom at midnight, or whether the gradual shortening of your sessions and increase in breaks is a sign of burnout creeping in. These patterns exist — they're just invisible.
 
-RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and after just three sessions starts using AI to surface patterns, detect risk signals and give coaching that's grounded in the user's own data rather than generic advice.
+RIACT makes them visible. It tracks study sessions by location and time, calculates net study time by automatically accounting for breaks, and uses AI to surface patterns and give coaching that's grounded in the user's own data rather than generic advice. Risk signals are detected separately, by a rules engine rather than a model.
 
 ---
 
@@ -30,7 +30,7 @@ RIACT makes them visible. It tracks study sessions by location and time, calcula
 
 ---
 
-**AI Insights** unlock after three sessions. The Insights page sends your session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that you consistently produce your best net study time on Tuesday mornings at the library, it says so specifically — not generically.
+**AI Insights** run as soon as you have logged a session, though they need a few before the patterns mean much — the home page tracks progress towards three as a suggested minimum. The Insights page sends your session history to GPT-4o-mini, which analyses patterns across location, time of day, break frequency, and session length to surface personalised recommendations. If the AI identifies that you consistently produce your best net study time on Tuesday mornings at the library, it says so specifically — not generically.
 
 **Burnout Detection** runs continuously in the background. A deterministic, rule-based function monitors concrete signals — sessions getting shorter over time, breaks becoming more frequent, late-night cramming clustering, goal completion rates dropping — and surfaces a warning when enough signals are present. No model ever makes a claim about a user's mental state. The banner shows what the data looks like. The student decides what it means.
 
@@ -62,9 +62,9 @@ Data visualisation uses Recharts. Icons are from Lucide React. Date handling use
 
 ## AI Architecture
 
-When a user triggers an AI feature, a Next.js serverless API route fetches their last 30 days of sessions, active goals, and full class schedule from Supabase using a Bearer-token authenticated client — meaning RLS applies server-side and the route can only access data belonging to the authenticated user. That data is formatted as structured context and passed to GPT-4o-mini with a task-specific prompt.
+When a user triggers an AI feature, a Next.js serverless API route fetches the slice of their data that feature needs from Supabase, using a Bearer-token authenticated client — meaning RLS applies server-side and the route can only access data belonging to the authenticated user. Insights pulls the last 30 days of sessions along with their breaks; the Coach and the Weekly Plan pull the last 30 days of sessions, active goals, and the full class schedule. That data is formatted as structured context and passed to GPT-4o-mini with a task-specific prompt.
 
-For the Insights page, the model returns personalised recommendation bullet points. For the Weekly Plan, the endpoint uses `response_format: json_object` to return a structured day-by-day schedule. For the AI Coach, the model receives the full conversation history alongside the session context and responds conversationally.
+For the Insights page, the model returns a one-sentence pattern summary and three recommendations — and nothing else: it is explicitly instructed not to assess burnout, wellbeing or mental state. For the Weekly Plan, the endpoint uses `response_format: json_object` to return a structured day-by-day schedule. For the AI Coach, the model receives the full conversation history alongside the session context and responds conversationally.
 
 JWT decoding happens locally on the server using a manual base64 decode — no extra network round-trip — to keep latency well under Vercel's 10-second serverless function timeout. Client-side AbortControllers cap all AI requests at 9 seconds and fail gracefully if the timeout is hit.
 
@@ -143,7 +143,7 @@ npm test
 
 The suite covers the burnout detection rules — the deterministic core described under [Responsible AI Design](#responsible-ai-design). It needs no database or API key.
 
-The AI features — Insights, Weekly Plan and Coach — need at least three completed sessions before they have enough history to analyse. Everything else works from the first session.
+The AI features work from your first logged session, but they have little to go on until you have a handful. The home page shows progress towards three sessions as a suggested starting point.
 
 ---
 
