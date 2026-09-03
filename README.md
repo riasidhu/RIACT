@@ -121,11 +121,13 @@ Then fill in the three values:
 
 | Variable | Where to find it |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → `anon` `public` key |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → your project → **Connect** → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → your project → **Connect** → publishable key (`sb_publishable_…`). Older projects show this as the `anon` `public` key; either works. |
 | `OPENAI_API_KEY` | platform.openai.com → API keys |
 
-`.env.local` is gitignored. Only the two `NEXT_PUBLIC_` values are exposed to the browser — the OpenAI key is read exclusively inside API routes and never reaches the client.
+Supabase is retiring the `anon` naming in favour of publishable keys by the end
+of 2026; the variable name here is unchanged and accepts either. `.env.local` is
+gitignored. Only the two `NEXT_PUBLIC_` values are exposed to the browser — the OpenAI key is read exclusively inside API routes and never reaches the client.
 
 **4. Start the dev server**
 
@@ -141,7 +143,7 @@ Open [http://localhost:3000](http://localhost:3000), sign up with an email and p
 npm test
 ```
 
-The suite covers the burnout detection rules — the deterministic core described under [Responsible AI Design](#responsible-ai-design). It needs no database or API key.
+The suite covers the burnout detection rules — the deterministic core described under [Responsible AI Design](#responsible-ai-design) — and goal progress tracking. It needs no database or API key.
 
 The AI features work from your first logged session, but they have little to go on until you have a handful. The home page shows progress towards three sessions as a suggested starting point.
 
