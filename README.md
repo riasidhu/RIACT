@@ -1,6 +1,6 @@
 # RIACT — Record, Insight, Analyze, Coach, Track
 
-[![DOI](https://img.shields.io/badge/DOI-10.35542%2Fosf.io%2F94hr5__v1-blue)](https://doi.org/10.35542/osf.io/94hr5_v1) [![CI](https://github.com/riasidhu/RIACT/actions/workflows/ci.yml/badge.svg)](https://github.com/riasidhu/RIACT/actions/workflows/ci.yml) [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com) [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?logo=openai&logoColor=white)](https://openai.com) [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://riact-riasidhus-projects.vercel.app) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-10.35542%2Fosf.io%2F94hr5__v1-blue)](https://doi.org/10.35542/osf.io/94hr5_v1) [![arXiv](https://img.shields.io/badge/arXiv-2608.21379-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2608.21379) [![CI](https://github.com/riasidhu/RIACT/actions/workflows/ci.yml/badge.svg)](https://github.com/riasidhu/RIACT/actions/workflows/ci.yml) [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com) [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?logo=openai&logoColor=white)](https://openai.com) [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://riact-riasidhus-projects.vercel.app) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **RIACT is an AI-powered study habit tracker that helps students understand where and when they study best, detect burnout before it hits and get personalised coaching from an AI that knows their data.**
 
@@ -149,11 +149,15 @@ The AI features work from your first logged session, but they have little to go 
 
 ## Citation
 
-RIACT is described in a peer-viewable preprint:
+RIACT is described in a preprint, available on both EdArXiv and arXiv:
 
 > Sidhu, R. (2026). *RIACT: A responsible AI system for personalized study habit tracking and early burnout signal detection in university students.* EdArXiv. https://doi.org/10.35542/osf.io/94hr5_v1
 
-If you use or reference RIACT, please cite the preprint (see also `CITATION.cff`).
+> Sidhu, R. (2026). *RIACT: A responsible AI system for personalized study habit tracking and early burnout signal detection in university students.* arXiv:2608.21379 [cs.AI]. https://doi.org/10.48550/arXiv.2608.21379
+
+Both records describe the same work. Cite whichever suits the venue — arXiv is
+indexed under Artificial Intelligence (cs.AI) and Human-Computer Interaction
+(cs.HC). Machine-readable metadata for both is in `CITATION.cff`.
 
 ---
 

@@ -16,3 +16,10 @@ preferred-citation:
   year: 2026
   doi: "10.35542/osf.io/94hr5_v1"
   journal: "EdArXiv"
+  identifiers:
+    - type: doi
+      value: "10.48550/arXiv.2608.21379"
+      description: "arXiv version (cs.AI; cs.HC)"
+    - type: other
+      value: "arXiv:2608.21379"
+      description: "arXiv identifier"
