@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Figtree, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,16 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "RIACT — Study Tracking",
   description: "Record, Insight, Analyze, Coach, Track your study sessions",
+  applicationName: "RIACT",
+  appleWebApp: {
+    capable: true,
+    title: "RIACT",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ec4899",
 };
 
 export default function RootLayout({
